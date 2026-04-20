@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="bg_dark">#0F0F0F</color>
+    <color name="overlay_dark">#CC1A1A1A</color>
+    <color name="surface_dark">#00292929</color>
+    <color name="text_primary">#27FFFFFF</color>
+    <color name="text_secondary">#A0A0A0</color>
+
+    <!-- Colores de acción - Profesional Oscuro -->
+    <color name="action_primary">#2200D9FF</color>
+    <color name="action_primary_light">#8602272D</color>
+    <color name="action_success">#2D00E676</color>
+    <color name="action_success_light">#1DE9B6</color>
+    <color name="action_warning">#FFD600</color>
+    <color name="action_warning_dark">#FFA000</color>
+    <color name="action_danger">#FF5252</color>
+    <color name="action_danger_light">#FF6E40</color>
+    <color name="action_accent">#D946EF</color>
+    <color name="action_accent_light">#F0A4FF</color>
+</resources>
