@@ -22,7 +22,16 @@ public class Producto extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // --- APLICAR CONFIGURACIONES DE APARIENCIA Y NEGOCIO ---
+        ConfigManager manager = ConfigManager.getInstance(this);
+        manager.aplicarConfiguracionBase(this);
+        AppConfig config = manager.getConfig();
+
         setContentView(R.layout.activity_producto);
+        
+        // Aplicar estilos visuales (Color y Tamaño de letra) recursivamente
+        manager.aplicarEstilosVisuales(findViewById(android.R.id.content));
 
         dbHelper = new BD_DrogsDataBase(this);
 

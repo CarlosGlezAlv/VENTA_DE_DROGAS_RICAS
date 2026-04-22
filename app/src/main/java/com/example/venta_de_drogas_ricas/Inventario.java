@@ -23,6 +23,7 @@ public class Inventario extends AppCompatActivity {
     private ImageButton btnVolverInv;
     
     private BD_DrogsDataBase dbHelper;
+    private AppConfig config;
     private ArrayList<String> listaCarritoStr = new ArrayList<>();
     private ArrayList<ItemCarrito> itemsCarrito = new ArrayList<>();
     private ArrayAdapter<String> adapter;
@@ -33,7 +34,6 @@ public class Inventario extends AppCompatActivity {
     private String nombreActual = "";
     private String idActual = "";
 
-    // Clase auxiliar para manejar los items del carrito
     private static class ItemCarrito {
         String id;
         String nombre;
@@ -53,7 +53,15 @@ public class Inventario extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ConfigManager manager = ConfigManager.getInstance(this);
+        manager.aplicarConfiguracionBase(this);
+        config = manager.getConfig();
+
         setContentView(R.layout.activity_inventario);
+        
+        // Aplicar estilos visuales (Color y Tamaño de letra) recursivamente
+        manager.aplicarEstilosVisuales(findViewById(android.R.id.content));
 
         dbHelper = new BD_DrogsDataBase(this);
 
@@ -92,7 +100,8 @@ public class Inventario extends AppCompatActivity {
             stockDisponibleActual = cursor.getFloat(3);
             precioActual = cursor.getFloat(4);
 
-            tvInfoProd.setText("Prod: " + nombreActual + " | Stock: " + stockDisponibleActual + " | Precio: $" + precioActual);
+            String moneda = "$";
+            tvInfoProd.setText("Prod: " + nombreActual + " | Stock: " + stockDisponibleActual + " | Precio: " + moneda + precioActual);
             etCantidadVenta.setText("1");
             actualizarSubtotal();
         } else {
@@ -121,6 +130,7 @@ public class Inventario extends AppCompatActivity {
 
         float cantidadAVender = Float.parseFloat(cantStr);
 
+        // Bloqueo de stock por defecto (ya no depende del JSON)
         if (cantidadAVender > stockDisponibleActual) {
             Toast.makeText(this, "No hay suficiente stock. Disponible: " + stockDisponibleActual, Toast.LENGTH_LONG).show();
             return;
@@ -134,12 +144,14 @@ public class Inventario extends AppCompatActivity {
         ItemCarrito nuevoItem = new ItemCarrito(idActual, nombreActual, cantidadAVender, precioActual);
         itemsCarrito.add(nuevoItem);
         
-        String displayStr = nuevoItem.nombre + " x" + nuevoItem.cantidad + " = $" + nuevoItem.subtotal;
+        String moneda = "$";
+        String displayStr = nuevoItem.nombre + " x" + nuevoItem.cantidad + " = " + moneda + nuevoItem.subtotal;
         listaCarritoStr.add(displayStr);
         adapter.notifyDataSetChanged();
 
         totalGeneral += nuevoItem.subtotal;
-        tvTotalGeneral.setText("TOTAL GENERAL: $" + totalGeneral);
+        
+        tvTotalGeneral.setText("TOTAL: " + moneda + totalGeneral);
 
         limpiarConsulta();
     }
@@ -154,12 +166,10 @@ public class Inventario extends AppCompatActivity {
         db.beginTransaction();
         try {
             for (ItemCarrito item : itemsCarrito) {
-                // Obtener stock actual para restar
                 Cursor c = db.rawQuery("SELECT cantidad FROM productos WHERE id = ?", new String[]{item.id});
                 if (c.moveToFirst()) {
                     float stockActualBD = c.getFloat(0);
                     float nuevoStock = stockActualBD - item.cantidad;
-                    
                     ContentValues values = new ContentValues();
                     values.put("cantidad", nuevoStock);
                     db.update("productos", values, "id = ?", new String[]{item.id});
@@ -193,6 +203,6 @@ public class Inventario extends AppCompatActivity {
         listaCarritoStr.clear();
         adapter.notifyDataSetChanged();
         totalGeneral = 0;
-        tvTotalGeneral.setText("TOTAL GENERAL: $0.00");
+        tvTotalGeneral.setText("TOTAL: $0.00");
     }
 }

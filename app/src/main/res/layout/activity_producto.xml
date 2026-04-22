@@ -9,12 +9,13 @@
         android:layout_height="match_parent"
         android:contentDescription="@null"
         android:scaleType="centerCrop"
-        android:src="@drawable/fondo" />
+        android:src="@drawable/pantalla_de_carga" />
 
     <View
+        android:id="@+id/overlayView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/overlay_dark" />
+        android:background="#E6000000" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -22,9 +23,10 @@
         android:padding="12dp">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/mainCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardBackgroundColor="@color/surface_dark"
+            app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="16dp"
             app:cardElevation="10dp">
 
@@ -41,9 +43,10 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Volver"
                 android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/text_primary" />
+                app:tint="@android:color/black" />
 
             <TextView
+                android:id="@+id/tvTituloProd"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -51,17 +54,18 @@
                 android:layout_marginBottom="20dp"
                 android:letterSpacing="0.06"
                 android:text="GESTION DE PRODUCTOS"
-                android:textColor="@color/text_primary"
+                android:textColor="@android:color/black"
                 android:textSize="24sp"
                 android:textStyle="bold" />
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilCodigoP"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@color/text_secondary"
-                app:boxStrokeColor="@color/action_primary"
-                app:hintTextColor="@color/text_secondary">
+                android:textColorHint="#666666"
+                app:boxStrokeColor="#2196F3"
+                app:hintTextColor="#666666">
 
                 <EditText
                     android:id="@+id/etCodigo"
@@ -69,44 +73,43 @@
                     android:layout_height="wrap_content"
                     android:hint="Codigo del Producto"
                     android:inputType="number"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_secondary" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilNombreP"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textColorHint="@color/text_secondary"
-                app:boxStrokeColor="@color/action_primary"
-                app:hintTextColor="@color/text_secondary">
+                android:textColorHint="#666666"
+                app:boxStrokeColor="#2196F3"
+                app:hintTextColor="#666666">
 
                 <EditText
                     android:id="@+id/etNombre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Nombre"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_secondary" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilDescP"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textColorHint="@color/text_secondary"
-                app:boxStrokeColor="@color/action_primary"
-                app:hintTextColor="@color/text_secondary">
+                android:textColorHint="#666666"
+                app:boxStrokeColor="#2196F3"
+                app:hintTextColor="#666666">
 
                 <EditText
                     android:id="@+id/etDescripcion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Descripcion"
-                    android:textColor="@color/text_primary"
-                    android:textColorHint="@color/text_secondary" />
+                    android:textColor="@android:color/black" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -116,14 +119,15 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilExP"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="5dp"
                     android:layout_weight="1"
-                    android:textColorHint="@color/text_secondary"
-                    app:boxStrokeColor="@color/action_primary"
-                    app:hintTextColor="@color/text_secondary">
+                    android:textColorHint="#666666"
+                    app:boxStrokeColor="#2196F3"
+                    app:hintTextColor="#666666">
 
                     <EditText
                         android:id="@+id/etExistencia"
@@ -131,19 +135,19 @@
                         android:layout_height="wrap_content"
                         android:hint="Existencia"
                         android:inputType="numberDecimal"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_secondary" />
+                        android:textColor="@android:color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilPreP"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_weight="1"
-                    android:textColorHint="@color/text_secondary"
-                    app:boxStrokeColor="@color/action_primary"
-                    app:hintTextColor="@color/text_secondary">
+                    android:textColorHint="#666666"
+                    app:boxStrokeColor="#2196F3"
+                    app:hintTextColor="#666666">
 
                     <EditText
                         android:id="@+id/etPrecio"
@@ -151,8 +155,7 @@
                         android:layout_height="wrap_content"
                         android:hint="Precio"
                         android:inputType="numberDecimal"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_secondary" />
+                        android:textColor="@android:color/black" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
@@ -169,9 +172,9 @@
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:backgroundTint="@color/action_success"
+                    android:backgroundTint="#4CAF50"
                     android:text="GUARDAR"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp" />
@@ -182,9 +185,9 @@
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:backgroundTint="@color/action_primary"
+                    android:backgroundTint="#2196F3"
                     android:text="BUSCAR"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp" />
@@ -195,9 +198,9 @@
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:backgroundTint="@color/action_warning"
+                    android:backgroundTint="#FF9800"
                     android:text="EDITAR"
-                    android:textColor="@color/black"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp" />
@@ -208,9 +211,9 @@
                     android:layout_height="56dp"
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
-                    android:backgroundTint="@color/action_danger"
+                    android:backgroundTint="#F44336"
                     android:text="BORRAR"
-                    android:textColor="@color/white"
+                    android:textColor="@android:color/white"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     app:cornerRadius="10dp" />
@@ -221,9 +224,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="16dp"
-                android:backgroundTint="@color/action_accent"
+                android:backgroundTint="#9C27B0"
                 android:text="VER INVENTARIO / VENTA"
-                android:textColor="@color/white"
+                android:textColor="@android:color/white"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:cornerRadius="10dp" />
