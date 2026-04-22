@@ -21,13 +21,16 @@ import java.io.IOException;
 
 public class ConfigManager {
     private static final String FILE_NAME = "appconfig.json";
+    private static final String FILE_NAME_ALERTAS = "configuracion_alertas.json";
     private static ConfigManager instance;
     private AppConfig config;
+    private ConfiguracionAlertas configAlertas;
     private Context context;
 
     private ConfigManager(Context context) {
         this.context = context.getApplicationContext();
         loadConfig();
+        loadConfigAlertas();
     }
 
     public static synchronized ConfigManager getInstance(Context context) {
@@ -41,6 +44,12 @@ public class ConfigManager {
         if (config == null) loadConfig();
         return config;
     }
+
+    public ConfiguracionAlertas getConfigAlertas() {
+        if (configAlertas == null) loadConfigAlertas();
+        return configAlertas;
+    }
+
 
     public void aplicarConfiguracionBase(AppCompatActivity activity) {
         if (config == null) loadConfig();
@@ -151,6 +160,29 @@ public class ConfigManager {
         Gson gson = new Gson();
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(config, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadConfigAlertas() {
+        File file = new File(context.getFilesDir(), FILE_NAME_ALERTAS);
+        Gson gson = new Gson();
+        if (file.exists()) {
+            try (FileReader reader = new FileReader(file)) {
+                configAlertas = gson.fromJson(reader, ConfiguracionAlertas.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } 
+        if (configAlertas == null) configAlertas = new ConfiguracionAlertas();
+    }
+
+    public void saveConfigAlertas() {
+        File file = new File(context.getFilesDir(), FILE_NAME_ALERTAS);
+        Gson gson = new Gson();
+        try (FileWriter writer = new FileWriter(file)) {
+            gson.toJson(configAlertas, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }

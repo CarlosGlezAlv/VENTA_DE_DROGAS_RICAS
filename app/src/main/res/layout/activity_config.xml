@@ -143,6 +143,94 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Grupo Alertas y Stock -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ALERTAS Y STOCK"
+                    android:textColor="#00BCD4"
+                    android:textStyle="bold"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="#22FFFFFF"
+                    app:cardCornerRadius="12dp"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <EditText
+                            android:id="@+id/etMinimoAlerta"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mínimo Alerta"
+                            android:inputType="number"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#AAA" />
+
+                        <EditText
+                            android:id="@+id/etCritico"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Stock Crítico"
+                            android:inputType="number"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#AAA" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swBloquearSinStock"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Bloquear sin stock"
+                            android:textColor="@android:color/white" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swMostrarPopup"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Mostrar popup de alerta"
+                            android:textColor="@android:color/white" />
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/swUsarColor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Usar colores para alertas"
+                            android:textColor="@android:color/white" />
+
+                        <EditText
+                            android:id="@+id/etMensajeBajo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mensaje Stock Bajo"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#AAA" />
+
+                        <EditText
+                            android:id="@+id/etMensajeCritico"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mensaje Stock Crítico"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#AAA" />
+
+                        <EditText
+                            android:id="@+id/etMensajeSinStock"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:hint="Mensaje Sin Stock"
+                            android:textColor="@android:color/white"
+                            android:textColorHint="#AAA" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
             </LinearLayout>
         </ScrollView>
 

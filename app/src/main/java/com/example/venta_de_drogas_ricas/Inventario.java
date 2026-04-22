@@ -54,6 +54,12 @@ public class Inventario extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                androidx.core.app.ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+
         ConfigManager manager = ConfigManager.getInstance(this);
         manager.aplicarConfiguracionBase(this);
         config = manager.getConfig();
@@ -130,9 +136,11 @@ public class Inventario extends AppCompatActivity {
 
         float cantidadAVender = Float.parseFloat(cantStr);
 
-        // Bloqueo de stock por defecto (ya no depende del JSON)
-        if (cantidadAVender > stockDisponibleActual) {
-            Toast.makeText(this, "No hay suficiente stock. Disponible: " + stockDisponibleActual, Toast.LENGTH_LONG).show();
+        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(this).getConfigAlertas();
+
+        // Bloqueo de stock
+        if (configAlertas.stock.bloquear_sin_stock && cantidadAVender > stockDisponibleActual) {
+            Toast.makeText(this, configAlertas.alertas.mensaje_sin_stock + "\nStock Disponible: " + stockDisponibleActual, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -173,6 +181,9 @@ public class Inventario extends AppCompatActivity {
                     ContentValues values = new ContentValues();
                     values.put("cantidad", nuevoStock);
                     db.update("productos", values, "id = ?", new String[]{item.id});
+                    
+                    // Verificar alertas
+                    verificarAlertasDeStock(item.nombre, nuevoStock);
                 }
                 c.close();
             }
@@ -204,5 +215,78 @@ public class Inventario extends AppCompatActivity {
         adapter.notifyDataSetChanged();
         totalGeneral = 0;
         tvTotalGeneral.setText("TOTAL: $0.00");
+    }
+
+    private void verificarAlertasDeStock(String nombreProducto, float nuevoStock) {
+        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(this).getConfigAlertas();
+        
+        String mensaje = null;
+        String titulo = "Alerta de Stock";
+        int colorTemp = android.graphics.Color.BLACK;
+
+        if (nuevoStock <= 0) {
+            mensaje = configAlertas.alertas.mensaje_sin_stock;
+            colorTemp = android.graphics.Color.RED;
+        } else if (nuevoStock <= configAlertas.stock.critico) {
+            mensaje = configAlertas.alertas.mensaje_critico;
+            colorTemp = android.graphics.Color.RED;
+        } else if (nuevoStock <= configAlertas.stock.minimo_alerta) {
+            mensaje = configAlertas.alertas.mensaje_bajo;
+            colorTemp = android.graphics.Color.parseColor("#FFA500"); // Naranja
+        }
+
+        final int colorFinal = colorTemp;
+
+        if (mensaje != null) {
+            String mensajeFinal = "Producto: " + nombreProducto + "\n" + mensaje + "\nStock actual: " + nuevoStock;
+            
+            // 1. Mostrar Popup si está configurado
+            if (configAlertas.alertas.mostrar_popup) {
+                runOnUiThread(() -> {
+                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+                    
+                    android.widget.TextView titleView = new android.widget.TextView(this);
+                    titleView.setText(titulo);
+                    titleView.setPadding(40, 40, 40, 40);
+                    titleView.setTextSize(20);
+                    if (configAlertas.alertas.usar_color) {
+                        titleView.setTextColor(colorFinal);
+                    }
+                    builder.setCustomTitle(titleView);
+                    
+                    builder.setMessage(mensajeFinal);
+                    builder.setPositiveButton("Entendido", null);
+                    builder.show();
+                });
+            }
+
+            // 2. Mostrar Notificación del Sistema
+            mostrarNotificacionSistema(nombreProducto, mensajeFinal);
+        }
+    }
+    
+    private void mostrarNotificacionSistema(String titulo, String mensaje) {
+        android.app.NotificationManager notificationManager = (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        String channelId = "stock_alerts_channel";
+        
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            android.app.NotificationChannel channel = new android.app.NotificationChannel(
+                channelId, "Alertas de Stock", android.app.NotificationManager.IMPORTANCE_HIGH);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(channel);
+            }
+        }
+        
+        androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle("Alerta: " + titulo)
+            .setContentText(mensaje)
+            .setStyle(new androidx.core.app.NotificationCompat.BigTextStyle().bigText(mensaje))
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true);
+            
+        if (notificationManager != null) {
+            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+        }
     }
 }

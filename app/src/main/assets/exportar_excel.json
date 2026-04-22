@@ -1,0 +1,13 @@
+{
+    "fecha": "2026-04-20 12:27:25",
+    "productos": [
+        {
+            "codigo": "1",
+            "nombre": "Chocolate ",
+            "precio": 25,
+            "cantidad": 2,
+            "subtotal": 50
+        }
+    ],
+    "total_venta": 50
+}

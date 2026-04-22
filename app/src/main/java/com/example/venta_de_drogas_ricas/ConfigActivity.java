@@ -20,6 +20,11 @@ public class ConfigActivity extends AppCompatActivity {
     private ImageButton btnVolverConfig;
     private ConfigManager configManager;
     private AppConfig config;
+    
+    // Alertas y Stock
+    private EditText etMinimoAlerta, etCritico, etMensajeBajo, etMensajeCritico, etMensajeSinStock;
+    private SwitchMaterial swBloquearSinStock, swMostrarPopup, swUsarColor;
+    private ConfiguracionAlertas configAlertas;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,7 @@ public class ConfigActivity extends AppCompatActivity {
 
         configManager = ConfigManager.getInstance(this);
         config = configManager.getConfig();
+        configAlertas = configManager.getConfigAlertas();
 
         // Apariencia
         swTemaOscuro = findViewById(R.id.swTemaOscuro);
@@ -39,6 +45,16 @@ public class ConfigActivity extends AppCompatActivity {
 
         // Negocio
         etNombreTienda = findViewById(R.id.etNombreTienda);
+
+        // Alertas y Stock
+        etMinimoAlerta = findViewById(R.id.etMinimoAlerta);
+        etCritico = findViewById(R.id.etCritico);
+        swBloquearSinStock = findViewById(R.id.swBloquearSinStock);
+        swMostrarPopup = findViewById(R.id.swMostrarPopup);
+        swUsarColor = findViewById(R.id.swUsarColor);
+        etMensajeBajo = findViewById(R.id.etMensajeBajo);
+        etMensajeCritico = findViewById(R.id.etMensajeCritico);
+        etMensajeSinStock = findViewById(R.id.etMensajeSinStock);
 
         btnGuardarConfig = findViewById(R.id.btnGuardarConfig);
         btnVolverConfig = findViewById(R.id.btnVolverConfig);
@@ -59,6 +75,18 @@ public class ConfigActivity extends AppCompatActivity {
 
         // Negocio
         etNombreTienda.setText(config.negocio.nombre_tienda);
+
+        // Alertas y Stock
+        if (etMinimoAlerta != null) {
+            etMinimoAlerta.setText(String.valueOf(configAlertas.stock.minimo_alerta));
+            etCritico.setText(String.valueOf(configAlertas.stock.critico));
+            swBloquearSinStock.setChecked(configAlertas.stock.bloquear_sin_stock);
+            swMostrarPopup.setChecked(configAlertas.alertas.mostrar_popup);
+            swUsarColor.setChecked(configAlertas.alertas.usar_color);
+            etMensajeBajo.setText(configAlertas.alertas.mensaje_bajo);
+            etMensajeCritico.setText(configAlertas.alertas.mensaje_critico);
+            etMensajeSinStock.setText(configAlertas.alertas.mensaje_sin_stock);
+        }
     }
 
     private void guardarCambios() {
@@ -74,6 +102,24 @@ public class ConfigActivity extends AppCompatActivity {
 
             // Guardar Negocio
             config.negocio.nombre_tienda = etNombreTienda.getText().toString();
+
+            // Guardar Alertas y Stock
+            if (etMinimoAlerta != null) {
+                try {
+                    configAlertas.stock.minimo_alerta = Integer.parseInt(etMinimoAlerta.getText().toString());
+                    configAlertas.stock.critico = Integer.parseInt(etCritico.getText().toString());
+                } catch (NumberFormatException e) {
+                    // Ignore, keep default/previous values
+                }
+                configAlertas.stock.bloquear_sin_stock = swBloquearSinStock.isChecked();
+                configAlertas.alertas.mostrar_popup = swMostrarPopup.isChecked();
+                configAlertas.alertas.usar_color = swUsarColor.isChecked();
+                configAlertas.alertas.mensaje_bajo = etMensajeBajo.getText().toString();
+                configAlertas.alertas.mensaje_critico = etMensajeCritico.getText().toString();
+                configAlertas.alertas.mensaje_sin_stock = etMensajeSinStock.getText().toString();
+                
+                configManager.saveConfigAlertas();
+            }
 
             configManager.saveConfig();
             Toast.makeText(this, "Ajustes guardados con éxito", Toast.LENGTH_LONG).show();
