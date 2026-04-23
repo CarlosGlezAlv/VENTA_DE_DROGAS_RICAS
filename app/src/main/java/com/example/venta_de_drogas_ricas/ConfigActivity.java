@@ -1,11 +1,15 @@
 package com.example.venta_de_drogas_ricas;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -18,9 +22,14 @@ public class ConfigActivity extends AppCompatActivity {
     private RadioButton rbPequeno, rbMediano, rbGrande;
     private Button btnGuardarConfig;
     private ImageButton btnVolverConfig;
+    private Spinner spIdioma;
     private ConfigManager configManager;
     private AppConfig config;
-    
+    private SharedPreferences idiomaPrefs;
+
+    private static final String PREFS_IDIOMA = "idioma_prefs";
+    private static final String KEY_IDIOMA = "idioma";
+
     // Alertas y Stock
     private EditText etMinimoAlerta, etCritico, etMensajeBajo, etMensajeCritico, etMensajeSinStock;
     private SwitchMaterial swBloquearSinStock, swMostrarPopup, swUsarColor;
@@ -58,19 +67,114 @@ public class ConfigActivity extends AppCompatActivity {
 
         btnGuardarConfig = findViewById(R.id.btnGuardarConfig);
         btnVolverConfig = findViewById(R.id.btnVolverConfig);
+        spIdioma = findViewById(R.id.spIdioma);
+
+        idiomaPrefs = getSharedPreferences(PREFS_IDIOMA, MODE_PRIVATE);
+        setupSelectorIdioma();
 
         cargarValores();
+        aplicarTraducciones();
 
         btnGuardarConfig.setOnClickListener(v -> guardarCambios());
         btnVolverConfig.setOnClickListener(v -> finish());
+    }
+
+    private void aplicarTraducciones() {
+        TraductorManager traductor = TraductorManager.getInstance(this);
+        if (swTemaOscuro != null) swTemaOscuro.setText(
+            traductor.getString("config_modo_oscuro")
+        );
+        if (etColorEnfasis != null) etColorEnfasis.setHint(
+            traductor.getString("config_color_enfasis_hint")
+        );
+        if (rbPequeno != null) rbPequeno.setText(
+            traductor.getString("config_tamano_pequeno")
+        );
+        if (rbMediano != null) rbMediano.setText(
+            traductor.getString("config_tamano_mediano")
+        );
+        if (rbGrande != null) rbGrande.setText(
+            traductor.getString("config_tamano_grande")
+        );
+        if (etNombreTienda != null) etNombreTienda.setHint(
+            traductor.getString("config_nombre_tienda_hint")
+        );
+        if (etMinimoAlerta != null) etMinimoAlerta.setHint(
+            traductor.getString("config_alerta_minimo_hint")
+        );
+        if (etCritico != null) etCritico.setHint(
+            traductor.getString("config_alerta_critico_hint")
+        );
+        if (swBloquearSinStock != null) swBloquearSinStock.setText(
+            traductor.getString("config_bloquear_sin_stock")
+        );
+        if (swMostrarPopup != null) swMostrarPopup.setText(
+            traductor.getString("config_mostrar_popup")
+        );
+        if (swUsarColor != null) swUsarColor.setText(
+            traductor.getString("config_usar_color")
+        );
+        if (etMensajeBajo != null) etMensajeBajo.setHint(
+            traductor.getString("config_msg_bajo_hint")
+        );
+        if (etMensajeCritico != null) etMensajeCritico.setHint(
+            traductor.getString("config_msg_critico_hint")
+        );
+        if (etMensajeSinStock != null) etMensajeSinStock.setHint(
+            traductor.getString("config_msg_sin_stock_hint")
+        );
+        if (btnGuardarConfig != null) btnGuardarConfig.setText(
+            traductor.getString("config_btn_guardar")
+        );
+    }
+
+    private void setupSelectorIdioma() {
+        String[] idiomas = { "Español", "English" };
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_item,
+            idiomas
+        );
+        adapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        );
+        spIdioma.setAdapter(adapter);
+
+        String idiomaGuardado = idiomaPrefs.getString(KEY_IDIOMA, "es");
+        int posicion = "en".equals(idiomaGuardado) ? 1 : 0;
+        spIdioma.setSelection(posicion, false);
+
+        spIdioma.setOnItemSelectedListener(
+            new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(
+                    AdapterView<?> parent,
+                    android.view.View view,
+                    int position,
+                    long id
+                ) {
+                    String codigo = position == 1 ? "en" : "es";
+                    idiomaPrefs.edit().putString(KEY_IDIOMA, codigo).apply();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // No-op
+                }
+            }
+        );
     }
 
     private void cargarValores() {
         // Apariencia
         swTemaOscuro.setChecked(config.apariencia.tema_oscuro);
         etColorEnfasis.setText(config.apariencia.color_enfasis);
-        if ("pequeno".equals(config.apariencia.tamano_texto)) rbPequeno.setChecked(true);
-        else if ("grande".equals(config.apariencia.tamano_texto)) rbGrande.setChecked(true);
+        if (
+            "pequeno".equals(config.apariencia.tamano_texto)
+        ) rbPequeno.setChecked(true);
+        else if (
+            "grande".equals(config.apariencia.tamano_texto)
+        ) rbGrande.setChecked(true);
         else rbMediano.setChecked(true);
 
         // Negocio
@@ -78,9 +182,13 @@ public class ConfigActivity extends AppCompatActivity {
 
         // Alertas y Stock
         if (etMinimoAlerta != null) {
-            etMinimoAlerta.setText(String.valueOf(configAlertas.stock.minimo_alerta));
+            etMinimoAlerta.setText(
+                String.valueOf(configAlertas.stock.minimo_alerta)
+            );
             etCritico.setText(String.valueOf(configAlertas.stock.critico));
-            swBloquearSinStock.setChecked(configAlertas.stock.bloquear_sin_stock);
+            swBloquearSinStock.setChecked(
+                configAlertas.stock.bloquear_sin_stock
+            );
             swMostrarPopup.setChecked(configAlertas.alertas.mostrar_popup);
             swUsarColor.setChecked(configAlertas.alertas.usar_color);
             etMensajeBajo.setText(configAlertas.alertas.mensaje_bajo);
@@ -93,11 +201,16 @@ public class ConfigActivity extends AppCompatActivity {
         try {
             // Guardar Apariencia
             config.apariencia.tema_oscuro = swTemaOscuro.isChecked();
-            config.apariencia.color_enfasis = etColorEnfasis.getText().toString();
-            
+            config.apariencia.color_enfasis = etColorEnfasis
+                .getText()
+                .toString();
+
             int selectedId = rgTamanoLetra.getCheckedRadioButtonId();
-            if (selectedId == R.id.rbPequeno) config.apariencia.tamano_texto = "pequeno";
-            else if (selectedId == R.id.rbGrande) config.apariencia.tamano_texto = "grande";
+            if (selectedId == R.id.rbPequeno) config.apariencia.tamano_texto =
+                "pequeno";
+            else if (
+                selectedId == R.id.rbGrande
+            ) config.apariencia.tamano_texto = "grande";
             else config.apariencia.tamano_texto = "mediano";
 
             // Guardar Negocio
@@ -106,32 +219,62 @@ public class ConfigActivity extends AppCompatActivity {
             // Guardar Alertas y Stock
             if (etMinimoAlerta != null) {
                 try {
-                    configAlertas.stock.minimo_alerta = Integer.parseInt(etMinimoAlerta.getText().toString());
-                    configAlertas.stock.critico = Integer.parseInt(etCritico.getText().toString());
+                    configAlertas.stock.minimo_alerta = Integer.parseInt(
+                        etMinimoAlerta.getText().toString()
+                    );
+                    configAlertas.stock.critico = Integer.parseInt(
+                        etCritico.getText().toString()
+                    );
                 } catch (NumberFormatException e) {
                     // Ignore, keep default/previous values
                 }
-                configAlertas.stock.bloquear_sin_stock = swBloquearSinStock.isChecked();
-                configAlertas.alertas.mostrar_popup = swMostrarPopup.isChecked();
+                configAlertas.stock.bloquear_sin_stock =
+                    swBloquearSinStock.isChecked();
+                configAlertas.alertas.mostrar_popup =
+                    swMostrarPopup.isChecked();
                 configAlertas.alertas.usar_color = swUsarColor.isChecked();
-                configAlertas.alertas.mensaje_bajo = etMensajeBajo.getText().toString();
-                configAlertas.alertas.mensaje_critico = etMensajeCritico.getText().toString();
-                configAlertas.alertas.mensaje_sin_stock = etMensajeSinStock.getText().toString();
-                
+                configAlertas.alertas.mensaje_bajo = etMensajeBajo
+                    .getText()
+                    .toString();
+                configAlertas.alertas.mensaje_critico = etMensajeCritico
+                    .getText()
+                    .toString();
+                configAlertas.alertas.mensaje_sin_stock = etMensajeSinStock
+                    .getText()
+                    .toString();
+
                 configManager.saveConfigAlertas();
             }
 
             configManager.saveConfig();
             configManager.aplicarConfiguracionBase(this);
-            Toast.makeText(this, "Ajustes guardados con éxito", Toast.LENGTH_LONG).show();
+            TraductorManager.getInstance(this).cargarIdioma(this);
+            aplicarTraducciones();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_ajustes_guardados"
+                ),
+                Toast.LENGTH_LONG
+            ).show();
 
             // Sincronizar inmediatamente y reiniciar el stack en MainActivity
-            android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
-            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            android.content.Intent intent = new android.content.Intent(
+                this,
+                MainActivity.class
+            );
+            intent.addFlags(
+                android.content.Intent.FLAG_ACTIVITY_NEW_TASK |
+                    android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+            );
             startActivity(intent);
             finish();
         } catch (Exception e) {
-            Toast.makeText(this, "Error en los datos ingresados", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString("msg_error_datos"),
+                Toast.LENGTH_SHORT
+            ).show();
         }
     }
 }

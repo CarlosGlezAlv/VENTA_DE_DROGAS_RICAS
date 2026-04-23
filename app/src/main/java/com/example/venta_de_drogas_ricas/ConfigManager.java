@@ -76,7 +76,7 @@ public class ConfigManager {
         boolean isDark = config.apariencia.tema_oscuro;
 
         // 1. Fondos y Overlays (Eliminado en el rediseño M3)
-
+    
         // 2. Tarjetas (Compatibilidad con ambos tipos)
         if (v instanceof MaterialCardView) {
             MaterialCardView card = (MaterialCardView) v;

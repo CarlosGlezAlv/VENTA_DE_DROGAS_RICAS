@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 import java.util.List;
 
-public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder> {
+public class ProductoAdapter
+    extends RecyclerView.Adapter<ProductoAdapter.ProductoViewHolder>
+{
 
     private List<ProductoModel> productoList;
     private OnItemClickListener listener;
@@ -22,7 +24,10 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
         void onDeleteClick(ProductoModel producto);
     }
 
-    public ProductoAdapter(List<ProductoModel> productoList, OnItemClickListener listener) {
+    public ProductoAdapter(
+        List<ProductoModel> productoList,
+        OnItemClickListener listener
+    ) {
         this.productoList = productoList;
         this.listener = listener;
     }
@@ -34,23 +39,50 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
 
     @NonNull
     @Override
-    public ProductoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_producto, parent, false);
+    public ProductoViewHolder onCreateViewHolder(
+        @NonNull ViewGroup parent,
+        int viewType
+    ) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(
+            R.layout.item_producto,
+            parent,
+            false
+        );
         return new ProductoViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
+    public void onBindViewHolder(
+        @NonNull ProductoViewHolder holder,
+        int position
+    ) {
         ProductoModel producto = productoList.get(position);
-        
-        holder.tvItemCodigo.setText("Cód: " + producto.getId());
+
+        holder.tvItemCodigo.setText(
+            TraductorManager.getInstance(
+                holder.itemView.getContext()
+            ).getString("formato_codigo", producto.getId())
+        );
         holder.tvItemNombre.setText(producto.getNombre());
-        holder.tvItemPrecio.setText("$" + producto.getPrecio());
-        holder.tvItemStock.setText("Stock: " + producto.getCantidad());
+        holder.tvItemPrecio.setText(
+            TraductorManager.getInstance(
+                holder.itemView.getContext()
+            ).getString("formato_precio", String.valueOf(producto.getPrecio()))
+        );
+        holder.tvItemStock.setText(
+            TraductorManager.getInstance(
+                holder.itemView.getContext()
+            ).getString("formato_stock", String.valueOf(producto.getCantidad()))
+        );
 
         if (producto.isSelected()) {
             holder.cardProducto.setStrokeWidth(4);
-            holder.cardProducto.setStrokeColor(holder.itemView.getContext().getResources().getColor(android.R.color.holo_blue_light));
+            holder.cardProducto.setStrokeColor(
+                holder.itemView
+                    .getContext()
+                    .getResources()
+                    .getColor(android.R.color.holo_blue_light)
+            );
             holder.layoutAcciones.setVisibility(View.VISIBLE);
         } else {
             holder.cardProducto.setStrokeWidth(0);
@@ -66,8 +98,12 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
             listener.onItemClick(producto);
         });
 
-        holder.btnItemEditar.setOnClickListener(v -> listener.onEditClick(producto));
-        holder.btnItemEliminar.setOnClickListener(v -> listener.onDeleteClick(producto));
+        holder.btnItemEditar.setOnClickListener(v ->
+            listener.onEditClick(producto)
+        );
+        holder.btnItemEliminar.setOnClickListener(v ->
+            listener.onDeleteClick(producto)
+        );
     }
 
     @Override
@@ -76,6 +112,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.Produc
     }
 
     public static class ProductoViewHolder extends RecyclerView.ViewHolder {
+
         MaterialCardView cardProducto;
         TextView tvItemCodigo, tvItemNombre, tvItemPrecio, tvItemStock;
         LinearLayout layoutAcciones;

@@ -1,20 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8" ?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground">
+    android:background="?android:attr/colorBackground"
+>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+    >
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+        >
             <ImageButton
                 android:id="@+id/btnVolverConfig"
                 android:layout_width="48dp"
@@ -22,7 +26,8 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@android:drawable/ic_menu_revert"
                 app:tint="?attr/colorOnBackground"
-                android:layout_alignParentStart="true" />
+                android:layout_alignParentStart="true"
+            />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -30,7 +35,8 @@
                 android:textColor="?attr/colorOnBackground"
                 android:textSize="22sp"
                 android:textStyle="bold"
-                android:layout_centerInParent="true" />
+                android:layout_centerInParent="true"
+            />
         </RelativeLayout>
 
         <ScrollView
@@ -38,12 +44,14 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingBottom="16dp">
+            android:paddingBottom="16dp"
+        >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+            >
 
                 <!-- Grupo Apariencia -->
                 <TextView
@@ -52,7 +60,8 @@
                     android:text="APARIENCIA"
                     android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -60,31 +69,36 @@
                     app:cardBackgroundColor="?attr/colorSurface"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                >
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
-                        
+                        android:padding="16dp"
+                    >
+
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/swTemaOscuro"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Modo Oscuro"
                             android:textColor="?attr/colorOnSurface"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                        />
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                        >
                             <EditText
                                 android:id="@+id/etColorEnfasis"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Color de Botones (Hex ej: #FF0000)" />
+                                android:hint="Color de Botones (Hex ej: #FF0000)"
+                            />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <TextView
@@ -92,18 +106,54 @@
                             android:layout_height="wrap_content"
                             android:text="Tamaño de Letra:"
                             android:textColor="?attr/colorOnSurface"
-                            android:layout_marginTop="16dp" />
+                            android:layout_marginTop="16dp"
+                        />
 
                         <RadioGroup
                             android:id="@+id/rgTamanoLetra"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
-                            android:layout_marginTop="8dp">
-                            <RadioButton android:id="@+id/rbPequeno" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pequeño" android:textColor="?attr/colorOnSurface" />
-                            <RadioButton android:id="@+id/rbMediano" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Mediano" android:textColor="?attr/colorOnSurface" />
-                            <RadioButton android:id="@+id/rbGrande" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Grande" android:textColor="?attr/colorOnSurface" />
+                            android:layout_marginTop="8dp"
+                        >
+                            <RadioButton
+                                android:id="@+id/rbPequeno"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pequeño"
+                                android:textColor="?attr/colorOnSurface"
+                            />
+                            <RadioButton
+                                android:id="@+id/rbMediano"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Mediano"
+                                android:textColor="?attr/colorOnSurface"
+                            />
+                            <RadioButton
+                                android:id="@+id/rbGrande"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Grande"
+                                android:textColor="?attr/colorOnSurface"
+                            />
                         </RadioGroup>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Idioma:"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginTop="16dp"
+                        />
+
+                        <Spinner
+                            android:id="@+id/spIdioma"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:entries="@array/idiomas"
+                        />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -114,7 +164,8 @@
                     android:text="DATOS DEL NEGOCIO"
                     android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -122,21 +173,25 @@
                     app:cardBackgroundColor="?attr/colorSurface"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                >
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="16dp"
+                    >
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                        >
                             <EditText
                                 android:id="@+id/etNombreTienda"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Nombre de la Tienda" />
+                                android:hint="Nombre de la Tienda"
+                            />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -148,7 +203,8 @@
                     android:text="ALERTAS Y STOCK"
                     android:textColor="?attr/colorPrimary"
                     android:textStyle="bold"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp"
+                />
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -156,29 +212,34 @@
                     app:cardBackgroundColor="?attr/colorSurface"
                     app:cardCornerRadius="12dp"
                     app:cardElevation="2dp"
-                    android:layout_marginBottom="16dp">
+                    android:layout_marginBottom="16dp"
+                >
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="16dp">
+                        android:padding="16dp"
+                    >
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                        >
                             <com.google.android.material.textfield.TextInputLayout
                                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:layout_marginEnd="4dp">
+                                android:layout_marginEnd="4dp"
+                            >
                                 <EditText
                                     android:id="@+id/etMinimoAlerta"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:hint="Nivel de Alerta"
-                                    android:inputType="number" />
+                                    android:inputType="number"
+                                />
                             </com.google.android.material.textfield.TextInputLayout>
 
                             <com.google.android.material.textfield.TextInputLayout
@@ -186,13 +247,15 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:layout_marginStart="4dp">
+                                android:layout_marginStart="4dp"
+                            >
                                 <EditText
                                     android:id="@+id/etCritico"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     android:hint="Nivel Crítico"
-                                    android:inputType="number" />
+                                    android:inputType="number"
+                                />
                             </com.google.android.material.textfield.TextInputLayout>
                         </LinearLayout>
 
@@ -202,7 +265,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Bloquear ventas sin stock"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="?attr/colorOnSurface"
+                        />
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/swMostrarPopup"
@@ -210,7 +274,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Mostrar popup de alerta"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="?attr/colorOnSurface"
+                        />
 
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/swUsarColor"
@@ -218,42 +283,49 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Usar colores para alertas"
-                            android:textColor="?attr/colorOnSurface" />
+                            android:textColor="?attr/colorOnSurface"
+                        />
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                        >
                             <EditText
                                 android:id="@+id/etMensajeBajo"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Mensaje Stock Bajo" />
+                                android:hint="Mensaje Stock Bajo"
+                            />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                        >
                             <EditText
                                 android:id="@+id/etMensajeCritico"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Mensaje Stock Crítico" />
+                                android:hint="Mensaje Stock Crítico"
+                            />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp">
+                            android:layout_marginTop="8dp"
+                        >
                             <EditText
                                 android:id="@+id/etMensajeSinStock"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Mensaje Sin Stock" />
+                                android:hint="Mensaje Sin Stock"
+                            />
                         </com.google.android.material.textfield.TextInputLayout>
 
                     </LinearLayout>
@@ -271,7 +343,8 @@
             app:backgroundTint="?attr/colorPrimary"
             android:textColor="?attr/colorOnPrimary"
             android:textStyle="bold"
-            app:cornerRadius="30dp" />
+            app:cornerRadius="30dp"
+        />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

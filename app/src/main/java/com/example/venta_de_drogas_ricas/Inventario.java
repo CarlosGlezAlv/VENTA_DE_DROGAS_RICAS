@@ -21,12 +21,12 @@ public class Inventario extends AppCompatActivity {
     private Button btnAgregarAlCarrito, btnTerminarVenta;
     private RecyclerView rvCarrito;
     private ImageButton btnVolverInv;
-    
+
     private BD_DrogsDataBase dbHelper;
     private AppConfig config;
     private ArrayList<ItemCarrito> itemsCarrito = new ArrayList<>();
     private CarritoAdapter adapter;
-    
+
     private float totalGeneral = 0;
     private float precioActual = 0;
     private float stockDisponibleActual = 0;
@@ -37,9 +37,24 @@ public class Inventario extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                androidx.core.app.ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
+        if (
+            android.os.Build.VERSION.SDK_INT >=
+            android.os.Build.VERSION_CODES.TIRAMISU
+        ) {
+            if (
+                androidx.core.content.ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) !=
+                android.content.pm.PackageManager.PERMISSION_GRANTED
+            ) {
+                androidx.core.app.ActivityCompat.requestPermissions(
+                    this,
+                    new String[] {
+                        android.Manifest.permission.POST_NOTIFICATIONS,
+                    },
+                    101
+                );
             }
         }
 
@@ -63,44 +78,68 @@ public class Inventario extends AppCompatActivity {
         btnVolverInv = findViewById(R.id.btnVolverInv);
 
         rvCarrito.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new CarritoAdapter(itemsCarrito, new CarritoAdapter.CarritoListener() {
-            @Override
-            public void onSumarCantidad(ItemCarrito item, int position) {
-                float nuevoTotal = item.cantidad + 1;
-                item.cantidad = nuevoTotal;
-                item.subtotal = item.cantidad * item.precio;
-                recalcularTotal();
-                adapter.notifyItemChanged(position);
-            }
-
-            @Override
-            public void onRestarCantidad(ItemCarrito item, int position) {
-                if (item.cantidad > 1) {
-                    item.cantidad -= 1;
+        adapter = new CarritoAdapter(
+            itemsCarrito,
+            new CarritoAdapter.CarritoListener() {
+                @Override
+                public void onSumarCantidad(ItemCarrito item, int position) {
+                    float nuevoTotal = item.cantidad + 1;
+                    item.cantidad = nuevoTotal;
                     item.subtotal = item.cantidad * item.precio;
                     recalcularTotal();
                     adapter.notifyItemChanged(position);
-                } else {
-                    onRemoverItem(item, position);
+                }
+
+                @Override
+                public void onRestarCantidad(ItemCarrito item, int position) {
+                    if (item.cantidad > 1) {
+                        item.cantidad -= 1;
+                        item.subtotal = item.cantidad * item.precio;
+                        recalcularTotal();
+                        adapter.notifyItemChanged(position);
+                    } else {
+                        onRemoverItem(item, position);
+                    }
+                }
+
+                @Override
+                public void onRemoverItem(ItemCarrito item, int position) {
+                    itemsCarrito.remove(position);
+                    recalcularTotal();
+                    adapter.notifyItemRemoved(position);
+                    adapter.notifyItemRangeChanged(
+                        position,
+                        itemsCarrito.size()
+                    );
                 }
             }
-
-            @Override
-            public void onRemoverItem(ItemCarrito item, int position) {
-                itemsCarrito.remove(position);
-                recalcularTotal();
-                adapter.notifyItemRemoved(position);
-                adapter.notifyItemRangeChanged(position, itemsCarrito.size());
-            }
-        });
+        );
         rvCarrito.setAdapter(adapter);
 
         etCodigoInv.setOnFocusChangeListener((v, hasFocus) -> {
             if (!hasFocus) buscarProducto();
         });
 
-        com.google.android.material.textfield.TextInputLayout tilCodigo = findViewById(R.id.tilCodigo);
+        com.google.android.material.textfield.TextInputLayout tilCodigo =
+            findViewById(R.id.tilCodigo);
         tilCodigo.setStartIconOnClickListener(v -> buscarProducto());
+
+        TraductorManager traductor = TraductorManager.getInstance(this);
+
+        TextView tvTituloPos = findViewById(R.id.tvTituloPos);
+        if (tvTituloPos != null) {
+            tvTituloPos.setText(traductor.getString("inv_title"));
+        }
+
+        TextView tvCarritoLabel = findViewById(R.id.tvCarritoLabel);
+        if (tvCarritoLabel != null) {
+            tvCarritoLabel.setText(traductor.getString("inv_carrito_title"));
+        }
+
+        etCodigoInv.setHint(traductor.getString("inv_codigo_hint"));
+        etCantidadVenta.setHint(traductor.getString("inv_cantidad_hint"));
+        btnAgregarAlCarrito.setText(traductor.getString("inv_btn_anadir"));
+        btnTerminarVenta.setText(traductor.getString("inv_btn_finalizar"));
 
         btnAgregarAlCarrito.setOnClickListener(v -> agregarAlCarrito());
         btnTerminarVenta.setOnClickListener(v -> terminarVenta());
@@ -112,7 +151,12 @@ public class Inventario extends AppCompatActivity {
         for (ItemCarrito item : itemsCarrito) {
             totalGeneral += item.subtotal;
         }
-        tvTotalGeneral.setText(String.format("TOTAL: $%.2f", totalGeneral));
+        tvTotalGeneral.setText(
+            TraductorManager.getInstance(this).getString(
+                "inv_total",
+                totalGeneral
+            )
+        );
     }
 
     private void buscarProducto() {
@@ -120,7 +164,10 @@ public class Inventario extends AppCompatActivity {
         if (codigo.isEmpty()) return;
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM productos WHERE id = ?", new String[]{codigo});
+        Cursor cursor = db.rawQuery(
+            "SELECT * FROM productos WHERE id = ?",
+            new String[] { codigo }
+        );
 
         if (cursor.moveToFirst()) {
             idActual = cursor.getString(0);
@@ -129,10 +176,22 @@ public class Inventario extends AppCompatActivity {
             precioActual = cursor.getFloat(4);
 
             tvInfoProd.setText(nombreActual);
-            tvSubtotalConsultado.setText("Stock: " + stockDisponibleActual + " | Precio: $" + precioActual);
+            tvSubtotalConsultado.setText(
+                TraductorManager.getInstance(this).getString(
+                    "msg_stock_precio",
+                    String.valueOf(stockDisponibleActual),
+                    String.valueOf(precioActual)
+                )
+            );
             etCantidadVenta.setText("1");
         } else {
-            Toast.makeText(this, "Producto no encontrado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_producto_no_encontrado"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             limpiarConsulta();
         }
         cursor.close();
@@ -141,20 +200,43 @@ public class Inventario extends AppCompatActivity {
     private void agregarAlCarrito() {
         String cantStr = etCantidadVenta.getText().toString();
         if (idActual.isEmpty() || cantStr.isEmpty()) {
-            Toast.makeText(this, "Busque un producto y asigne cantidad", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_busque_producto"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
         float cantidadAVender = Float.parseFloat(cantStr);
-        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(this).getConfigAlertas();
+        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(
+            this
+        ).getConfigAlertas();
 
-        if (configAlertas.stock.bloquear_sin_stock && cantidadAVender > stockDisponibleActual) {
-            Toast.makeText(this, configAlertas.alertas.mensaje_sin_stock + "\nStock Disponible: " + stockDisponibleActual, Toast.LENGTH_LONG).show();
+        if (
+            configAlertas.stock.bloquear_sin_stock &&
+            cantidadAVender > stockDisponibleActual
+        ) {
+            Toast.makeText(
+                this,
+                configAlertas.alertas.mensaje_sin_stock +
+                    "\nStock Disponible: " +
+                    stockDisponibleActual,
+                Toast.LENGTH_LONG
+            ).show();
             return;
         }
 
         if (cantidadAVender <= 0) {
-            Toast.makeText(this, "La cantidad debe ser mayor a 0", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_cantidad_mayor_cero"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
@@ -169,7 +251,12 @@ public class Inventario extends AppCompatActivity {
         }
 
         if (!existe) {
-            ItemCarrito nuevoItem = new ItemCarrito(idActual, nombreActual, cantidadAVender, precioActual);
+            ItemCarrito nuevoItem = new ItemCarrito(
+                idActual,
+                nombreActual,
+                cantidadAVender,
+                precioActual
+            );
             itemsCarrito.add(nuevoItem);
         }
 
@@ -180,7 +267,13 @@ public class Inventario extends AppCompatActivity {
 
     private void terminarVenta() {
         if (itemsCarrito.isEmpty()) {
-            Toast.makeText(this, "El carrito está vacío", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_carrito_vacio"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
@@ -188,14 +281,22 @@ public class Inventario extends AppCompatActivity {
         db.beginTransaction();
         try {
             for (ItemCarrito item : itemsCarrito) {
-                Cursor c = db.rawQuery("SELECT cantidad FROM productos WHERE id = ?", new String[]{item.id});
+                Cursor c = db.rawQuery(
+                    "SELECT cantidad FROM productos WHERE id = ?",
+                    new String[] { item.id }
+                );
                 if (c.moveToFirst()) {
                     float stockActualBD = c.getFloat(0);
                     float nuevoStock = stockActualBD - item.cantidad;
                     ContentValues values = new ContentValues();
                     values.put("cantidad", nuevoStock);
-                    db.update("productos", values, "id = ?", new String[]{item.id});
-                    
+                    db.update(
+                        "productos",
+                        values,
+                        "id = ?",
+                        new String[] { item.id }
+                    );
+
                     verificarAlertasDeStock(item.nombre, nuevoStock);
                 }
                 c.close();
@@ -206,10 +307,20 @@ public class Inventario extends AppCompatActivity {
             VentasManager ventasManager = new VentasManager(this);
             ventasManager.registrarVenta(itemsCarrito, totalGeneral);
 
-            Toast.makeText(this, "VENTA EXITOSA. Stock actualizado.", Toast.LENGTH_LONG).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_venta_exitosa"
+                ),
+                Toast.LENGTH_LONG
+            ).show();
             limpiarTodo();
         } catch (Exception e) {
-            Toast.makeText(this, "Error al procesar venta", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString("msg_error_venta"),
+                Toast.LENGTH_SHORT
+            ).show();
         } finally {
             db.endTransaction();
         }
@@ -222,8 +333,14 @@ public class Inventario extends AppCompatActivity {
         stockDisponibleActual = 0;
         etCodigoInv.setText("");
         etCantidadVenta.setText("");
-        tvInfoProd.setText("Esperando código...");
-        tvSubtotalConsultado.setText("Stock: -- | Precio: $0.00");
+        tvInfoProd.setText(
+            TraductorManager.getInstance(this).getString("msg_esperando_codigo")
+        );
+        tvSubtotalConsultado.setText(
+            TraductorManager.getInstance(this).getString(
+                "msg_stock_precio_vacio"
+            )
+        );
     }
 
     private void limpiarTodo() {
@@ -233,11 +350,18 @@ public class Inventario extends AppCompatActivity {
         recalcularTotal();
     }
 
-    private void verificarAlertasDeStock(String nombreProducto, float nuevoStock) {
-        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(this).getConfigAlertas();
-        
+    private void verificarAlertasDeStock(
+        String nombreProducto,
+        float nuevoStock
+    ) {
+        ConfiguracionAlertas configAlertas = ConfigManager.getInstance(
+            this
+        ).getConfigAlertas();
+
         String mensaje = null;
-        String titulo = "Alerta de Stock";
+        String titulo = TraductorManager.getInstance(this).getString(
+            "alerta_stock_titulo"
+        );
         int colorTemp = android.graphics.Color.BLACK;
 
         if (nuevoStock <= 0) {
@@ -254,12 +378,19 @@ public class Inventario extends AppCompatActivity {
         final int colorFinal = colorTemp;
 
         if (mensaje != null) {
-            String mensajeFinal = "Producto: " + nombreProducto + "\n" + mensaje + "\nStock actual: " + nuevoStock;
-            
+            String mensajeFinal = TraductorManager.getInstance(this).getString(
+                "alerta_stock_producto",
+                nombreProducto,
+                mensaje,
+                String.valueOf(nuevoStock)
+            );
+
             if (configAlertas.alertas.mostrar_popup) {
                 runOnUiThread(() -> {
-                    android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-                    android.widget.TextView titleView = new android.widget.TextView(this);
+                    android.app.AlertDialog.Builder builder =
+                        new android.app.AlertDialog.Builder(this);
+                    android.widget.TextView titleView =
+                        new android.widget.TextView(this);
                     titleView.setText(titulo);
                     titleView.setPadding(40, 40, 40, 40);
                     titleView.setTextSize(20);
@@ -268,7 +399,12 @@ public class Inventario extends AppCompatActivity {
                     }
                     builder.setCustomTitle(titleView);
                     builder.setMessage(mensajeFinal);
-                    builder.setPositiveButton("Entendido", null);
+                    builder.setPositiveButton(
+                        TraductorManager.getInstance(this).getString(
+                            "alerta_entendido"
+                        ),
+                        null
+                    );
                     builder.show();
                 });
             }
@@ -276,29 +412,46 @@ public class Inventario extends AppCompatActivity {
             mostrarNotificacionSistema(nombreProducto, mensajeFinal);
         }
     }
-    
+
     private void mostrarNotificacionSistema(String titulo, String mensaje) {
-        android.app.NotificationManager notificationManager = (android.app.NotificationManager) getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+        android.app.NotificationManager notificationManager =
+            (android.app.NotificationManager) getSystemService(
+                android.content.Context.NOTIFICATION_SERVICE
+            );
         String channelId = "stock_alerts_channel";
-        
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            android.app.NotificationChannel channel = new android.app.NotificationChannel(
-                channelId, "Alertas de Stock", android.app.NotificationManager.IMPORTANCE_HIGH);
+
+        if (
+            android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O
+        ) {
+            android.app.NotificationChannel channel =
+                new android.app.NotificationChannel(
+                    channelId,
+                    "Alertas de Stock",
+                    android.app.NotificationManager.IMPORTANCE_HIGH
+                );
             if (notificationManager != null) {
                 notificationManager.createNotificationChannel(channel);
             }
         }
-        
-        androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
-            .setContentTitle("Alerta: " + titulo)
-            .setContentText(mensaje)
-            .setStyle(new androidx.core.app.NotificationCompat.BigTextStyle().bigText(mensaje))
-            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true);
-            
+
+        androidx.core.app.NotificationCompat.Builder builder =
+            new androidx.core.app.NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(android.R.drawable.ic_dialog_alert)
+                .setContentTitle("Alerta: " + titulo)
+                .setContentText(mensaje)
+                .setStyle(
+                    new androidx.core.app.NotificationCompat.BigTextStyle().bigText(
+                        mensaje
+                    )
+                )
+                .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
         if (notificationManager != null) {
-            notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+            notificationManager.notify(
+                (int) System.currentTimeMillis(),
+                builder.build()
+            );
         }
     }
 }

@@ -9,7 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoViewHolder> {
+public class CarritoAdapter
+    extends RecyclerView.Adapter<CarritoAdapter.CarritoViewHolder>
+{
 
     private List<ItemCarrito> itemsCarrito;
     private CarritoListener listener;
@@ -20,30 +22,57 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
         void onRemoverItem(ItemCarrito item, int position);
     }
 
-    public CarritoAdapter(List<ItemCarrito> itemsCarrito, CarritoListener listener) {
+    public CarritoAdapter(
+        List<ItemCarrito> itemsCarrito,
+        CarritoListener listener
+    ) {
         this.itemsCarrito = itemsCarrito;
         this.listener = listener;
     }
 
     @NonNull
     @Override
-    public CarritoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_carrito, parent, false);
+    public CarritoViewHolder onCreateViewHolder(
+        @NonNull ViewGroup parent,
+        int viewType
+    ) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(
+            R.layout.item_carrito,
+            parent,
+            false
+        );
         return new CarritoViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CarritoViewHolder holder, int position) {
+    public void onBindViewHolder(
+        @NonNull CarritoViewHolder holder,
+        int position
+    ) {
         ItemCarrito item = itemsCarrito.get(position);
-        
-        holder.tvCarritoNombre.setText(item.nombre);
-        holder.tvCarritoPrecioUnitario.setText("$" + item.precio + " c/u");
-        holder.tvCarritoCantidad.setText(String.valueOf(item.cantidad));
-        holder.tvCarritoSubtotal.setText("$" + item.subtotal);
 
-        holder.btnSumar.setOnClickListener(v -> listener.onSumarCantidad(item, position));
-        holder.btnRestar.setOnClickListener(v -> listener.onRestarCantidad(item, position));
-        holder.btnRemoverItem.setOnClickListener(v -> listener.onRemoverItem(item, position));
+        holder.tvCarritoNombre.setText(item.nombre);
+        holder.tvCarritoPrecioUnitario.setText(
+            TraductorManager.getInstance(
+                holder.itemView.getContext()
+            ).getString("formato_precio_cu", String.valueOf(item.precio))
+        );
+        holder.tvCarritoCantidad.setText(String.valueOf(item.cantidad));
+        holder.tvCarritoSubtotal.setText(
+            TraductorManager.getInstance(
+                holder.itemView.getContext()
+            ).getString("formato_precio", String.valueOf(item.subtotal))
+        );
+
+        holder.btnSumar.setOnClickListener(v ->
+            listener.onSumarCantidad(item, position)
+        );
+        holder.btnRestar.setOnClickListener(v ->
+            listener.onRestarCantidad(item, position)
+        );
+        holder.btnRemoverItem.setOnClickListener(v ->
+            listener.onRemoverItem(item, position)
+        );
     }
 
     @Override
@@ -52,13 +81,16 @@ public class CarritoAdapter extends RecyclerView.Adapter<CarritoAdapter.CarritoV
     }
 
     public static class CarritoViewHolder extends RecyclerView.ViewHolder {
+
         TextView tvCarritoNombre, tvCarritoPrecioUnitario, tvCarritoCantidad, tvCarritoSubtotal;
         ImageButton btnSumar, btnRestar, btnRemoverItem;
 
         public CarritoViewHolder(@NonNull View itemView) {
             super(itemView);
             tvCarritoNombre = itemView.findViewById(R.id.tvCarritoNombre);
-            tvCarritoPrecioUnitario = itemView.findViewById(R.id.tvCarritoPrecioUnitario);
+            tvCarritoPrecioUnitario = itemView.findViewById(
+                R.id.tvCarritoPrecioUnitario
+            );
             tvCarritoCantidad = itemView.findViewById(R.id.tvCarritoCantidad);
             tvCarritoSubtotal = itemView.findViewById(R.id.tvCarritoSubtotal);
             btnSumar = itemView.findViewById(R.id.btnSumar);

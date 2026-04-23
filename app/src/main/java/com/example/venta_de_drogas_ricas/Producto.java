@@ -53,31 +53,52 @@ public class Producto extends AppCompatActivity {
         btnVolverProd = findViewById(R.id.btnVolverProd);
         rvProductos = findViewById(R.id.rvProductos);
 
+        TraductorManager traductor = TraductorManager.getInstance(this);
+
+        android.widget.TextView tvTituloProd = findViewById(R.id.tvTituloProd);
+        if (tvTituloProd != null) {
+            tvTituloProd.setText(traductor.getString("prod_title"));
+        }
+
+        btnGuardar.setText(traductor.getString("prod_btn_guardar"));
+        btnLimpiar.setText(traductor.getString("prod_btn_limpiar"));
+        btnIrInventario.setText(traductor.getString("prod_btn_resumen"));
+        tilCodigoP.setHint(traductor.getString("prod_codigo_hint"));
+        tilNombreP.setHint(traductor.getString("prod_nombre_hint"));
+        etDescripcion.setHint(traductor.getString("prod_desc_hint"));
+        etExistencia.setHint(traductor.getString("prod_existencia_hint"));
+        etPrecio.setHint(traductor.getString("prod_precio_hint"));
+
         rvProductos.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ProductoAdapter(listaProductos, new ProductoAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(ProductoModel producto) {
-                cargarEnFormulario(producto);
-            }
+        adapter = new ProductoAdapter(
+            listaProductos,
+            new ProductoAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(ProductoModel producto) {
+                    cargarEnFormulario(producto);
+                }
 
-            @Override
-            public void onEditClick(ProductoModel producto) {
-                cargarEnFormulario(producto);
-                etNombre.requestFocus();
-            }
+                @Override
+                public void onEditClick(ProductoModel producto) {
+                    cargarEnFormulario(producto);
+                    etNombre.requestFocus();
+                }
 
-            @Override
-            public void onDeleteClick(ProductoModel producto) {
-                eliminar(producto.getId());
+                @Override
+                public void onDeleteClick(ProductoModel producto) {
+                    eliminar(producto.getId());
+                }
             }
-        });
+        );
         rvProductos.setAdapter(adapter);
 
         // Búsqueda Exacta
         tilCodigoP.setEndIconOnClickListener(v -> buscarPorCodigo());
 
         // Búsqueda Amplia
-        tilNombreP.setEndIconOnClickListener(v -> cargarListaProductos(etNombre.getText().toString()));
+        tilNombreP.setEndIconOnClickListener(v ->
+            cargarListaProductos(etNombre.getText().toString())
+        );
 
         btnGuardar.setOnClickListener(v -> guardarOActualizar());
         btnLimpiar.setOnClickListener(v -> limpiarFormulario());
@@ -98,18 +119,23 @@ public class Producto extends AppCompatActivity {
         if (filtroNombre.isEmpty()) {
             cursor = db.rawQuery("SELECT * FROM productos", null);
         } else {
-            cursor = db.rawQuery("SELECT * FROM productos WHERE nombre LIKE ?", new String[]{"%" + filtroNombre + "%"});
+            cursor = db.rawQuery(
+                "SELECT * FROM productos WHERE nombre LIKE ?",
+                new String[] { "%" + filtroNombre + "%" }
+            );
         }
 
         if (cursor.moveToFirst()) {
             do {
-                listaProductos.add(new ProductoModel(
+                listaProductos.add(
+                    new ProductoModel(
                         cursor.getString(0),
                         cursor.getString(1),
                         cursor.getString(2),
                         cursor.getFloat(3),
                         cursor.getFloat(4)
-                ));
+                    )
+                );
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -119,28 +145,43 @@ public class Producto extends AppCompatActivity {
     private void buscarPorCodigo() {
         String codigo = etCodigo.getText().toString();
         if (codigo.isEmpty()) {
-            Toast.makeText(this, "Ingrese un código", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_ingrese_codigo"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             return;
         }
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM productos WHERE id = ?", new String[]{codigo});
+        Cursor cursor = db.rawQuery(
+            "SELECT * FROM productos WHERE id = ?",
+            new String[] { codigo }
+        );
         if (cursor.moveToFirst()) {
             ProductoModel p = new ProductoModel(
-                    cursor.getString(0),
-                    cursor.getString(1),
-                    cursor.getString(2),
-                    cursor.getFloat(3),
-                    cursor.getFloat(4)
+                cursor.getString(0),
+                cursor.getString(1),
+                cursor.getString(2),
+                cursor.getFloat(3),
+                cursor.getFloat(4)
             );
             cargarEnFormulario(p);
-            
+
             // Highlight in list
             for (ProductoModel item : listaProductos) {
                 item.setSelected(item.getId().equals(codigo));
             }
             adapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "No encontrado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_no_encontrado"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             limpiarFormularioExceptoCodigo();
         }
         cursor.close();
@@ -157,7 +198,13 @@ public class Producto extends AppCompatActivity {
     private void guardarOActualizar() {
         String codigo = etCodigo.getText().toString();
         if (codigo.isEmpty()) {
-            Toast.makeText(this, "Debe ingresar un código", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_debe_ingresar_codigo"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
@@ -169,21 +216,42 @@ public class Producto extends AppCompatActivity {
         values.put("cantidad", etExistencia.getText().toString());
         values.put("precio", etPrecio.getText().toString());
 
-        long result = db.insertWithOnConflict("productos", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        long result = db.insertWithOnConflict(
+            "productos",
+            null,
+            values,
+            SQLiteDatabase.CONFLICT_REPLACE
+        );
         if (result != -1) {
-            Toast.makeText(this, "Guardado exitosamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_guardado_exito"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
             limpiarFormulario();
             cargarListaProductos("");
         } else {
-            Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString(
+                    "msg_error_guardar"
+                ),
+                Toast.LENGTH_SHORT
+            ).show();
         }
     }
 
     private void eliminar(String codigo) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        int count = db.delete("productos", "id = ?", new String[]{codigo});
+        int count = db.delete("productos", "id = ?", new String[] { codigo });
         if (count > 0) {
-            Toast.makeText(this, "Eliminado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                this,
+                TraductorManager.getInstance(this).getString("msg_eliminado"),
+                Toast.LENGTH_SHORT
+            ).show();
             limpiarFormulario();
             cargarListaProductos("");
         }

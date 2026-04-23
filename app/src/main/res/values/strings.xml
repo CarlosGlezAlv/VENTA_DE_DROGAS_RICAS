@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">VENTA_DE_DROGAS_RICAS</string>
+
+    <string-array name="idiomas">
+        <item>Español</item>
+        <item>English</item>
+    </string-array>
 </resources>
