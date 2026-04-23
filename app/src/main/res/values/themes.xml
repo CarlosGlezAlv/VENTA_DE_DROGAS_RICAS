@@ -2,7 +2,13 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.VENTA_DE_DROGAS_RICAS" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/primary_light</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/outline_light</item>
+        <item name="android:colorBackground">@color/bg_light</item>
+        <item name="colorSurface">@color/surface_light</item>
+        <item name="colorOnSurface">@color/text_primary_light</item>
+        <item name="colorOnBackground">@color/text_primary_light</item>
     </style>
 
     <style name="Theme.VENTA_DE_DROGAS_RICAS" parent="Base.Theme.VENTA_DE_DROGAS_RICAS" />

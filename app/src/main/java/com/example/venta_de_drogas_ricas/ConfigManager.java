@@ -75,10 +75,7 @@ public class ConfigManager {
     private void aplicarRecursivo(View v) {
         boolean isDark = config.apariencia.tema_oscuro;
 
-        // 1. Fondos y Overlays
-        if (v.getId() == R.id.overlayView) {
-            v.setBackgroundColor(isDark ? Color.parseColor("#CC000000") : Color.parseColor("#99FFFFFF"));
-        }
+        // 1. Fondos y Overlays (Eliminado en el rediseño M3)
 
         // 2. Tarjetas (Compatibilidad con ambos tipos)
         if (v instanceof MaterialCardView) {

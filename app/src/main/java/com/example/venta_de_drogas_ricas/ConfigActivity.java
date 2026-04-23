@@ -122,7 +122,13 @@ public class ConfigActivity extends AppCompatActivity {
             }
 
             configManager.saveConfig();
+            configManager.aplicarConfiguracionBase(this);
             Toast.makeText(this, "Ajustes guardados con éxito", Toast.LENGTH_LONG).show();
+
+            // Sincronizar inmediatamente y reiniciar el stack en MainActivity
+            android.content.Intent intent = new android.content.Intent(this, MainActivity.class);
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK | android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             finish();
         } catch (Exception e) {
             Toast.makeText(this, "Error en los datos ingresados", Toast.LENGTH_SHORT).show();

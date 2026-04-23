@@ -5,32 +5,35 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.textfield.TextInputLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Producto extends AppCompatActivity {
 
     private EditText etCodigo, etNombre, etDescripcion, etExistencia, etPrecio;
-    private Button btnGuardar, btnConsultar, btnModificar, btnEliminar, btnIrInventario;
+    private Button btnGuardar, btnLimpiar, btnIrInventario;
+    private TextInputLayout tilCodigoP, tilNombreP;
     private ImageButton btnVolverProd;
+    private RecyclerView rvProductos;
+    private ProductoAdapter adapter;
     private BD_DrogsDataBase dbHelper;
+    private List<ProductoModel> listaProductos = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // --- APLICAR CONFIGURACIONES DE APARIENCIA Y NEGOCIO ---
         ConfigManager manager = ConfigManager.getInstance(this);
         manager.aplicarConfiguracionBase(this);
-        AppConfig config = manager.getConfig();
-
         setContentView(R.layout.activity_producto);
-        
-        // Aplicar estilos visuales (Color y Tamaño de letra) recursivamente
         manager.aplicarEstilosVisuales(findViewById(android.R.id.content));
 
         dbHelper = new BD_DrogsDataBase(this);
@@ -41,116 +44,160 @@ public class Producto extends AppCompatActivity {
         etExistencia = findViewById(R.id.etExistencia);
         etPrecio = findViewById(R.id.etPrecio);
 
+        tilCodigoP = findViewById(R.id.tilCodigoP);
+        tilNombreP = findViewById(R.id.tilNombreP);
+
         btnGuardar = findViewById(R.id.btnGuardar);
-        btnConsultar = findViewById(R.id.btnConsultar);
-        btnModificar = findViewById(R.id.btnModificar);
-        btnEliminar = findViewById(R.id.btnEliminar);
+        btnLimpiar = findViewById(R.id.btnLimpiar);
         btnIrInventario = findViewById(R.id.btnIrInventario);
         btnVolverProd = findViewById(R.id.btnVolverProd);
+        rvProductos = findViewById(R.id.rvProductos);
 
-        btnGuardar.setOnClickListener(v -> guardar());
-        btnConsultar.setOnClickListener(v -> consultar());
-        btnModificar.setOnClickListener(v -> modificar());
-        btnEliminar.setOnClickListener(v -> eliminar());
-        
+        rvProductos.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ProductoAdapter(listaProductos, new ProductoAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ProductoModel producto) {
+                cargarEnFormulario(producto);
+            }
+
+            @Override
+            public void onEditClick(ProductoModel producto) {
+                cargarEnFormulario(producto);
+                etNombre.requestFocus();
+            }
+
+            @Override
+            public void onDeleteClick(ProductoModel producto) {
+                eliminar(producto.getId());
+            }
+        });
+        rvProductos.setAdapter(adapter);
+
+        // Búsqueda Exacta
+        tilCodigoP.setEndIconOnClickListener(v -> buscarPorCodigo());
+
+        // Búsqueda Amplia
+        tilNombreP.setEndIconOnClickListener(v -> cargarListaProductos(etNombre.getText().toString()));
+
+        btnGuardar.setOnClickListener(v -> guardarOActualizar());
+        btnLimpiar.setOnClickListener(v -> limpiarFormulario());
+
         btnIrInventario.setOnClickListener(v -> {
-            Intent intent = new Intent(Producto.this, Inventario.class);
-            startActivity(intent);
+            startActivity(new Intent(Producto.this, Inventario.class));
         });
 
         btnVolverProd.setOnClickListener(v -> finish());
+
+        cargarListaProductos("");
     }
 
-    private void guardar() {
-        if (etCodigo.getText().toString().isEmpty()) {
-            Toast.makeText(this, "Debe ingresar un código", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("id", etCodigo.getText().toString());
-        values.put("nombre", etNombre.getText().toString());
-        values.put("descripcion", etDescripcion.getText().toString());
-        values.put("cantidad", etExistencia.getText().toString());
-        values.put("precio", etPrecio.getText().toString());
-
-        long newRowId = db.insert("productos", null, values);
-        if (newRowId != -1) {
-            Toast.makeText(this, "Producto guardado con éxito", Toast.LENGTH_SHORT).show();
-            limpiar();
+    private void cargarListaProductos(String filtroNombre) {
+        listaProductos.clear();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor;
+        if (filtroNombre.isEmpty()) {
+            cursor = db.rawQuery("SELECT * FROM productos", null);
         } else {
-            Toast.makeText(this, "Error: El código ya existe o datos inválidos", Toast.LENGTH_SHORT).show();
+            cursor = db.rawQuery("SELECT * FROM productos WHERE nombre LIKE ?", new String[]{"%" + filtroNombre + "%"});
         }
+
+        if (cursor.moveToFirst()) {
+            do {
+                listaProductos.add(new ProductoModel(
+                        cursor.getString(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getFloat(3),
+                        cursor.getFloat(4)
+                ));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        adapter.notifyDataSetChanged();
     }
 
-    private void consultar() {
+    private void buscarPorCodigo() {
         String codigo = etCodigo.getText().toString();
         if (codigo.isEmpty()) {
-            Toast.makeText(this, "Ingrese código para buscar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Ingrese un código", Toast.LENGTH_SHORT).show();
             return;
         }
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM productos WHERE id = ?", new String[]{codigo});
-
         if (cursor.moveToFirst()) {
-            etNombre.setText(cursor.getString(1));
-            etDescripcion.setText(cursor.getString(2));
-            etExistencia.setText(cursor.getString(3));
-            etPrecio.setText(cursor.getString(4));
-            Toast.makeText(this, "Producto encontrado", Toast.LENGTH_SHORT).show();
+            ProductoModel p = new ProductoModel(
+                    cursor.getString(0),
+                    cursor.getString(1),
+                    cursor.getString(2),
+                    cursor.getFloat(3),
+                    cursor.getFloat(4)
+            );
+            cargarEnFormulario(p);
+            
+            // Highlight in list
+            for (ProductoModel item : listaProductos) {
+                item.setSelected(item.getId().equals(codigo));
+            }
+            adapter.notifyDataSetChanged();
         } else {
-            Toast.makeText(this, "Producto no registrado", Toast.LENGTH_SHORT).show();
-            limpiarExceptoCodigo();
+            Toast.makeText(this, "No encontrado", Toast.LENGTH_SHORT).show();
+            limpiarFormularioExceptoCodigo();
         }
         cursor.close();
     }
 
-    private void modificar() {
+    private void cargarEnFormulario(ProductoModel p) {
+        etCodigo.setText(p.getId());
+        etNombre.setText(p.getNombre());
+        etDescripcion.setText(p.getDescripcion());
+        etExistencia.setText(String.valueOf(p.getCantidad()));
+        etPrecio.setText(String.valueOf(p.getPrecio()));
+    }
+
+    private void guardarOActualizar() {
         String codigo = etCodigo.getText().toString();
         if (codigo.isEmpty()) {
-            Toast.makeText(this, "Ingrese código para modificar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Debe ingresar un código", Toast.LENGTH_SHORT).show();
             return;
         }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put("id", codigo);
         values.put("nombre", etNombre.getText().toString());
         values.put("descripcion", etDescripcion.getText().toString());
         values.put("cantidad", etExistencia.getText().toString());
         values.put("precio", etPrecio.getText().toString());
 
-        int count = db.update("productos", values, "id = ?", new String[]{codigo});
-        if (count > 0) {
-            Toast.makeText(this, "Producto actualizado", Toast.LENGTH_SHORT).show();
+        long result = db.insertWithOnConflict("productos", null, values, SQLiteDatabase.CONFLICT_REPLACE);
+        if (result != -1) {
+            Toast.makeText(this, "Guardado exitosamente", Toast.LENGTH_SHORT).show();
+            limpiarFormulario();
+            cargarListaProductos("");
         } else {
-            Toast.makeText(this, "No se pudo actualizar", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void eliminar() {
-        String codigo = etCodigo.getText().toString();
-        if (codigo.isEmpty()) {
-            Toast.makeText(this, "Ingrese código para eliminar", Toast.LENGTH_SHORT).show();
-            return;
-        }
+    private void eliminar(String codigo) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         int count = db.delete("productos", "id = ?", new String[]{codigo});
         if (count > 0) {
-            Toast.makeText(this, "Producto eliminado", Toast.LENGTH_SHORT).show();
-            limpiar();
-        } else {
-            Toast.makeText(this, "No se encontró el producto", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Eliminado", Toast.LENGTH_SHORT).show();
+            limpiarFormulario();
+            cargarListaProductos("");
         }
     }
 
-    private void limpiar() {
+    private void limpiarFormulario() {
         etCodigo.setText("");
-        etNombre.setText("");
-        etDescripcion.setText("");
-        etExistencia.setText("");
-        etPrecio.setText("");
+        limpiarFormularioExceptoCodigo();
+        for (ProductoModel p : listaProductos) p.setSelected(false);
+        adapter.notifyDataSetChanged();
+        etCodigo.requestFocus();
     }
 
-    private void limpiarExceptoCodigo() {
+    private void limpiarFormularioExceptoCodigo() {
         etNombre.setText("");
         etDescripcion.setText("");
         etExistencia.setText("");

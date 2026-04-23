@@ -2,6 +2,7 @@ package com.example.venta_de_drogas_ricas;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
-        Button btnConfiguracion = findViewById(R.id.btnConfiguracion);
+        View btnConfiguracion = findViewById(R.id.btnConfiguracion);
         if (btnConfiguracion != null) {
             btnConfiguracion.setOnClickListener(v -> {
                 Intent intent = new Intent(MainActivity.this, ConfigActivity.class);

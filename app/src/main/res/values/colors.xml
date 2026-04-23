@@ -3,22 +3,25 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Versión CLARA (Día) -->
-    <color name="bg_dark">#F0F2F5</color>
-    <color name="overlay_dark">#99000000</color>
-    <color name="surface_dark">#FFFFFF</color>
-    <color name="text_primary">#1A1A1A</color>
-    <color name="text_secondary">#666666</color>
+    <!-- Theme Colors -->
+    <!-- Light Mode -->
+    <color name="bg_light">#F5F5F7</color>
+    <color name="surface_light">#FFFFFF</color>
+    <color name="primary_light">#4CAF50</color>
+    <color name="primary_dark_light">#388E3C</color>
+    <color name="text_primary_light">#1A1A1A</color>
+    <color name="text_secondary_light">#666666</color>
+    <color name="outline_light">#757575</color>
 
-    <!-- Colores de acción - Profesional Oscuro -->
-    <color name="action_primary">#FF00BCD4</color>
-    <color name="action_primary_light">#E0F7FA</color>
-    <color name="action_success">#FF4CAF50</color>
-    <color name="action_success_light">#C8E6C9</color>
-    <color name="action_warning">#FFFF9800</color>
-    <color name="action_warning_dark">#F57C00</color>
+    <!-- Dark Mode -->
+    <color name="bg_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="primary_dark">#2E7D32</color>
+    <color name="text_primary_dark">#E0E0E0</color>
+    <color name="text_secondary_dark">#9E9E9E</color>
+    <color name="outline_dark">#BDBDBD</color>
+
+    <!-- Shared/Status -->
     <color name="action_danger">#FFF44336</color>
-    <color name="action_danger_light">#FFCDD2</color>
-    <color name="action_accent">#FF9C27B0</color>
-    <color name="action_accent_light">#E1BEE7</color>
+    <color name="action_warning">#FFFF9800</color>
 </resources>
