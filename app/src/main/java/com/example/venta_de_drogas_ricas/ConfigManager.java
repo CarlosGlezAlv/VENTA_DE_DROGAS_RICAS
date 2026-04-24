@@ -24,10 +24,12 @@ public class ConfigManager {
     private static final String FILE_NAME = "appconfig.json";
     private static final String FILE_NAME_ALERTAS =
         "configuracion_alertas.json";
+    private static final String FILE_NAME_THEME = "theme_config.json";
     private static final String DEFAULT_MONEDA = "MXN";
     private static ConfigManager instance;
     private AppConfig config;
     private ConfiguracionAlertas configAlertas;
+    private ThemeConfig themeConfig;
     private Context context;
 
     private ConfigManager(Context context) {
@@ -187,11 +189,24 @@ public class ConfigManager {
         }
         if (config == null) config = new AppConfig();
 
+        loadThemeConfig();
+        if (themeConfig != null && config.apariencia != null) {
+            config.apariencia.tema_oscuro = "dark".equals(themeConfig.mode);
+        }
+
         normalizarConfiguracionMoneda();
     }
 
     public void saveConfig() {
         normalizarConfiguracionMoneda();
+
+        if (
+            themeConfig != null && config != null && config.apariencia != null
+        ) {
+            themeConfig.mode = config.apariencia.tema_oscuro ? "dark" : "day";
+            themeConfig.updatedAt = System.currentTimeMillis();
+            saveThemeConfig();
+        }
 
         File file = new File(context.getFilesDir(), FILE_NAME);
         Gson gson = new Gson();
@@ -223,6 +238,41 @@ public class ConfigManager {
         Gson gson = new Gson();
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(configAlertas, writer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadThemeConfig() {
+        File file = new File(context.getFilesDir(), FILE_NAME_THEME);
+        Gson gson = new Gson();
+        if (file.exists()) {
+            try (FileReader reader = new FileReader(file)) {
+                themeConfig = gson.fromJson(reader, ThemeConfig.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try (
+                java.io.InputStream is = context
+                    .getAssets()
+                    .open(FILE_NAME_THEME);
+                java.io.InputStreamReader reader =
+                    new java.io.InputStreamReader(is)
+            ) {
+                themeConfig = gson.fromJson(reader, ThemeConfig.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (themeConfig == null) themeConfig = new ThemeConfig();
+    }
+
+    public void saveThemeConfig() {
+        File file = new File(context.getFilesDir(), FILE_NAME_THEME);
+        Gson gson = new Gson();
+        try (FileWriter writer = new FileWriter(file)) {
+            gson.toJson(themeConfig, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
