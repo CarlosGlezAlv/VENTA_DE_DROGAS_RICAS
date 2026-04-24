@@ -20,8 +20,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class ConfigManager {
+
     private static final String FILE_NAME = "appconfig.json";
-    private static final String FILE_NAME_ALERTAS = "configuracion_alertas.json";
+    private static final String FILE_NAME_ALERTAS =
+        "configuracion_alertas.json";
+    private static final String DEFAULT_MONEDA = "MXN";
     private static ConfigManager instance;
     private AppConfig config;
     private ConfiguracionAlertas configAlertas;
@@ -50,19 +53,22 @@ public class ConfigManager {
         return configAlertas;
     }
 
-
     public void aplicarConfiguracionBase(AppCompatActivity activity) {
         if (config == null) loadConfig();
-        
+
         if (config.negocio != null && config.negocio.nombre_tienda != null) {
             activity.setTitle(config.negocio.nombre_tienda);
         }
-        
+
         if (config.apariencia != null) {
             if (config.apariencia.tema_oscuro) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_YES
+                );
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                AppCompatDelegate.setDefaultNightMode(
+                    AppCompatDelegate.MODE_NIGHT_NO
+                );
             }
         }
     }
@@ -76,28 +82,47 @@ public class ConfigManager {
         boolean isDark = config.apariencia.tema_oscuro;
 
         // 1. Fondos y Overlays (Eliminado en el rediseño M3)
-    
+
         // 2. Tarjetas (Compatibilidad con ambos tipos)
         if (v instanceof MaterialCardView) {
             MaterialCardView card = (MaterialCardView) v;
-            card.setCardBackgroundColor(isDark ? Color.parseColor("#33FFFFFF") : Color.parseColor("#FFFFFF"));
-            card.setStrokeColor(ColorStateList.valueOf(isDark ? Color.parseColor("#55FFFFFF") : Color.parseColor("#DDDDDD")));
+            card.setCardBackgroundColor(
+                isDark
+                    ? Color.parseColor("#33FFFFFF")
+                    : Color.parseColor("#FFFFFF")
+            );
+            card.setStrokeColor(
+                ColorStateList.valueOf(
+                    isDark
+                        ? Color.parseColor("#55FFFFFF")
+                        : Color.parseColor("#DDDDDD")
+                )
+            );
         } else if (v instanceof CardView) {
-            ((CardView) v).setCardBackgroundColor(isDark ? Color.parseColor("#222222") : Color.parseColor("#FFFFFF"));
+            ((CardView) v).setCardBackgroundColor(
+                isDark
+                    ? Color.parseColor("#222222")
+                    : Color.parseColor("#FFFFFF")
+            );
         }
 
         // 3. Textos, Botones y Inputs
         if (v instanceof TextView) {
             TextView tv = (TextView) v;
-            
+
             // Tamaño de letra
             float size = 16f; // Mediano
             if ("pequeno".equals(config.apariencia.tamano_texto)) size = 13f;
-            else if ("grande".equals(config.apariencia.tamano_texto)) size = 26f;
+            else if ("grande".equals(config.apariencia.tamano_texto)) size =
+                26f;
             tv.setTextSize(size);
 
             // Color de texto (evitar sobreescribir colores especiales de estado)
-            if (v.getId() != R.id.tvInfoProd && v.getId() != R.id.tvSubtotalConsultado && v.getId() != R.id.tvTotalGeneral) {
+            if (
+                v.getId() != R.id.tvInfoProd &&
+                v.getId() != R.id.tvSubtotalConsultado &&
+                v.getId() != R.id.tvTotalGeneral
+            ) {
                 tv.setTextColor(isDark ? Color.WHITE : Color.BLACK);
             }
         }
@@ -109,16 +134,22 @@ public class ConfigManager {
                 if (!hex.startsWith("#")) hex = "#" + hex;
                 int color = Color.parseColor(hex);
                 v.setBackgroundTintList(ColorStateList.valueOf(color));
-                ((Button) v).setTextColor(isColorDark(color) ? Color.WHITE : Color.BLACK);
+                ((Button) v).setTextColor(
+                    isColorDark(color) ? Color.WHITE : Color.BLACK
+                );
             } catch (Exception e) {}
         } else if (v instanceof ImageButton) {
-            ((ImageButton) v).setImageTintList(ColorStateList.valueOf(isDark ? Color.WHITE : Color.BLACK));
+            ((ImageButton) v).setImageTintList(
+                ColorStateList.valueOf(isDark ? Color.WHITE : Color.BLACK)
+            );
         }
-        
+
         // 5. TextInputLayout
         if (v instanceof TextInputLayout) {
             TextInputLayout til = (TextInputLayout) v;
-            til.setHintTextColor(ColorStateList.valueOf(isDark ? Color.WHITE : Color.BLACK));
+            til.setHintTextColor(
+                ColorStateList.valueOf(isDark ? Color.WHITE : Color.BLACK)
+            );
             try {
                 String hex = config.apariencia.color_enfasis;
                 if (!hex.startsWith("#")) hex = "#" + hex;
@@ -135,7 +166,12 @@ public class ConfigManager {
     }
 
     private boolean isColorDark(int color) {
-        double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
+        double darkness =
+            1 -
+            (0.299 * Color.red(color) +
+                0.587 * Color.green(color) +
+                0.114 * Color.blue(color)) /
+            255;
         return darkness >= 0.5;
     }
 
@@ -148,11 +184,15 @@ public class ConfigManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } 
+        }
         if (config == null) config = new AppConfig();
+
+        normalizarConfiguracionMoneda();
     }
 
     public void saveConfig() {
+        normalizarConfiguracionMoneda();
+
         File file = new File(context.getFilesDir(), FILE_NAME);
         Gson gson = new Gson();
         try (FileWriter writer = new FileWriter(file)) {
@@ -167,11 +207,14 @@ public class ConfigManager {
         Gson gson = new Gson();
         if (file.exists()) {
             try (FileReader reader = new FileReader(file)) {
-                configAlertas = gson.fromJson(reader, ConfiguracionAlertas.class);
+                configAlertas = gson.fromJson(
+                    reader,
+                    ConfiguracionAlertas.class
+                );
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } 
+        }
         if (configAlertas == null) configAlertas = new ConfiguracionAlertas();
     }
 
@@ -183,5 +226,39 @@ public class ConfigManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void normalizarConfiguracionMoneda() {
+        if (config == null) {
+            config = new AppConfig();
+        }
+        if (config.negocio == null) {
+            config.negocio = new AppConfig.Negocio();
+        }
+
+        String base = normalizarMoneda(config.negocio.moneda_base);
+        String visual = normalizarMoneda(config.negocio.moneda_visual);
+
+        if (base == null) base = DEFAULT_MONEDA;
+        if (visual == null) visual = DEFAULT_MONEDA;
+
+        MonedaManager monedaManager = MonedaManager.getInstance(context);
+
+        if (!monedaManager.esMonedaSoportada(base)) {
+            base = DEFAULT_MONEDA;
+        }
+        if (!monedaManager.esMonedaSoportada(visual)) {
+            visual = base;
+        }
+
+        config.negocio.moneda_base = base;
+        config.negocio.moneda_visual = visual;
+    }
+
+    private String normalizarMoneda(String moneda) {
+        if (moneda == null) return null;
+        String valor = moneda.trim().toUpperCase();
+        if (valor.isEmpty()) return null;
+        return valor;
     }
 }

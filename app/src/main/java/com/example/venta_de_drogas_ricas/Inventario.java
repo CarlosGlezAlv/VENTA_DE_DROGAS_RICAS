@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 public class Inventario extends AppCompatActivity {
@@ -29,6 +30,9 @@ public class Inventario extends AppCompatActivity {
 
     private float totalGeneral = 0;
     private float precioActual = 0;
+    private MonedaManager monedaManager;
+    private String monedaBase = "MXN";
+    private String monedaVisual = "MXN";
     private float stockDisponibleActual = 0;
     private String nombreActual = "";
     private String idActual = "";
@@ -66,6 +70,23 @@ public class Inventario extends AppCompatActivity {
         manager.aplicarEstilosVisuales(findViewById(android.R.id.content));
 
         dbHelper = new BD_DrogsDataBase(this);
+        monedaManager = MonedaManager.getInstance(this);
+        if (config != null && config.negocio != null) {
+            if (
+                config.negocio.moneda_base != null &&
+                !config.negocio.moneda_base.trim().isEmpty()
+            ) {
+                monedaBase = config.negocio.moneda_base.trim().toUpperCase();
+            }
+            if (
+                config.negocio.moneda_visual != null &&
+                !config.negocio.moneda_visual.trim().isEmpty()
+            ) {
+                monedaVisual = config.negocio.moneda_visual
+                    .trim()
+                    .toUpperCase();
+            }
+        }
 
         etCodigoInv = findViewById(R.id.etCodigoInv);
         etCantidadVenta = findViewById(R.id.etCantidadVenta);
@@ -151,11 +172,13 @@ public class Inventario extends AppCompatActivity {
         for (ItemCarrito item : itemsCarrito) {
             totalGeneral += item.subtotal;
         }
+        BigDecimal totalVisual = monedaManager.convertir(
+            BigDecimal.valueOf(totalGeneral),
+            monedaBase,
+            monedaVisual
+        );
         tvTotalGeneral.setText(
-            TraductorManager.getInstance(this).getString(
-                "inv_total",
-                totalGeneral
-            )
+            "TOTAL: " + monedaManager.formatear(totalVisual, monedaVisual)
         );
     }
 
@@ -176,11 +199,16 @@ public class Inventario extends AppCompatActivity {
             precioActual = cursor.getFloat(4);
 
             tvInfoProd.setText(nombreActual);
+            BigDecimal precioVisual = monedaManager.convertir(
+                BigDecimal.valueOf(precioActual),
+                monedaBase,
+                monedaVisual
+            );
             tvSubtotalConsultado.setText(
                 TraductorManager.getInstance(this).getString(
                     "msg_stock_precio",
                     String.valueOf(stockDisponibleActual),
-                    String.valueOf(precioActual)
+                    monedaManager.formatear(precioVisual, monedaVisual)
                 )
             );
             etCantidadVenta.setText("1");

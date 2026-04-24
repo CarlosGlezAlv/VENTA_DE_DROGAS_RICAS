@@ -31,11 +31,11 @@
     "inv_cantidad_hint": "Cant.",
     "inv_btn_anadir": "AÑADIR",
     "inv_carrito_title": "CARRITO DE COMPRAS",
-    "inv_total": "TOTAL: $%.2f",
+    "inv_total": "TOTAL: %s",
     "inv_btn_finalizar": "FINALIZAR",
     "msg_esperando_codigo": "Esperando código...",
-    "msg_stock_precio_vacio": "Stock: -- | Precio: $0.00",
-    "msg_stock_precio": "Stock: %1$s | Precio: $%2$s",
+    "msg_stock_precio_vacio": "Stock: -- | Precio: 0.00",
+    "msg_stock_precio": "Stock: %1$s | Precio: %2$s",
     "msg_producto_no_encontrado": "Producto no encontrado",
     "msg_busque_producto": "Busque un producto y asigne cantidad",
     "msg_cantidad_mayor_cero": "La cantidad debe ser mayor a 0",
@@ -45,7 +45,7 @@
     "alerta_stock_titulo": "Alerta de Stock",
     "alerta_entendido": "Entendido",
     "alerta_stock_producto": "Producto: %1$s\n%2$s\nStock actual: %3$s",
-    "formato_precio_cu": "$%s c/u",
+    "formato_precio_cu": "%s c/u",
     "prod_title": "GESTIÓN DE PRODUCTOS",
     "prod_codigo_hint": "Código Exacto",
     "prod_nombre_hint": "Nombre para Filtrar",
@@ -63,7 +63,7 @@
     "msg_eliminado": "Eliminado",
     "formato_codigo": "Cód: %s",
     "formato_stock": "Stock: %s",
-    "formato_precio": "$%s"
+    "formato_precio": "%s"
   },
   "en": {
     "main_title": "Lumina Retail",
@@ -97,11 +97,11 @@
     "inv_cantidad_hint": "Qty.",
     "inv_btn_anadir": "ADD",
     "inv_carrito_title": "SHOPPING CART",
-    "inv_total": "TOTAL: $%.2f",
+    "inv_total": "TOTAL: %s",
     "inv_btn_finalizar": "FINISH",
     "msg_esperando_codigo": "Waiting for code...",
-    "msg_stock_precio_vacio": "Stock: -- | Price: $0.00",
-    "msg_stock_precio": "Stock: %1$s | Price: $%2$s",
+    "msg_stock_precio_vacio": "Stock: -- | Price: 0.00",
+    "msg_stock_precio": "Stock: %1$s | Price: %2$s",
     "msg_producto_no_encontrado": "Product not found",
     "msg_busque_producto": "Search for a product and assign quantity",
     "msg_cantidad_mayor_cero": "Quantity must be greater than 0",
@@ -111,7 +111,7 @@
     "alerta_stock_titulo": "Stock Alert",
     "alerta_entendido": "Understood",
     "alerta_stock_producto": "Product: %1$s\n%2$s\nCurrent stock: %3$s",
-    "formato_precio_cu": "$%s ea",
+    "formato_precio_cu": "%s ea",
     "prod_title": "PRODUCT MANAGEMENT",
     "prod_codigo_hint": "Exact Code",
     "prod_nombre_hint": "Name to Filter",
@@ -129,6 +129,6 @@
     "msg_eliminado": "Deleted",
     "formato_codigo": "Code: %s",
     "formato_stock": "Stock: %s",
-    "formato_precio": "$%s"
+    "formato_precio": "%s"
   }
 }

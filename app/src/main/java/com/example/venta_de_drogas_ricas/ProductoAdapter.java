@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class ProductoAdapter
@@ -64,10 +65,36 @@ public class ProductoAdapter
             ).getString("formato_codigo", producto.getId())
         );
         holder.tvItemNombre.setText(producto.getNombre());
+        AppConfig appConfig = ConfigManager.getInstance(
+            holder.itemView.getContext()
+        ).getConfig();
+        String monedaBase = "MXN";
+        String monedaVisual = "MXN";
+        if (appConfig != null && appConfig.negocio != null) {
+            if (
+                appConfig.negocio.moneda_base != null &&
+                !appConfig.negocio.moneda_base.trim().isEmpty()
+            ) {
+                monedaBase = appConfig.negocio.moneda_base;
+            }
+            if (
+                appConfig.negocio.moneda_visual != null &&
+                !appConfig.negocio.moneda_visual.trim().isEmpty()
+            ) {
+                monedaVisual = appConfig.negocio.moneda_visual;
+            }
+        }
+
+        MonedaManager monedaManager = MonedaManager.getInstance(
+            holder.itemView.getContext()
+        );
+        BigDecimal precioConvertido = monedaManager.convertir(
+            BigDecimal.valueOf(producto.getPrecio()),
+            monedaBase,
+            monedaVisual
+        );
         holder.tvItemPrecio.setText(
-            TraductorManager.getInstance(
-                holder.itemView.getContext()
-            ).getString("formato_precio", String.valueOf(producto.getPrecio()))
+            monedaManager.formatear(precioConvertido, monedaVisual)
         );
         holder.tvItemStock.setText(
             TraductorManager.getInstance(

@@ -7,6 +7,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class CarritoAdapter
@@ -52,17 +53,55 @@ public class CarritoAdapter
         ItemCarrito item = itemsCarrito.get(position);
 
         holder.tvCarritoNombre.setText(item.nombre);
+        AppConfig config = ConfigManager.getInstance(
+            holder.itemView.getContext()
+        ).getConfig();
+        String monedaBase = (config != null && config.negocio != null)
+            ? config.negocio.moneda_base
+            : "MXN";
+        String monedaVisual = (config != null && config.negocio != null)
+            ? config.negocio.moneda_visual
+            : "MXN";
+        int decimales = (config != null && config.negocio != null)
+            ? config.negocio.decimales_moneda
+            : 2;
+        boolean incluirCodigo =
+            config != null &&
+            config.negocio != null &&
+            config.negocio.mostrar_codigo_moneda;
+
+        MonedaManager monedaManager = MonedaManager.getInstance(
+            holder.itemView.getContext()
+        );
+
+        String precioUnitarioFmt = monedaManager.formatear(
+            monedaManager.convertir(
+                BigDecimal.valueOf(item.precio),
+                monedaBase,
+                monedaVisual
+            ),
+            monedaVisual,
+            decimales,
+            incluirCodigo
+        );
+        String subtotalFmt = monedaManager.formatear(
+            monedaManager.convertir(
+                BigDecimal.valueOf(item.subtotal),
+                monedaBase,
+                monedaVisual
+            ),
+            monedaVisual,
+            decimales,
+            incluirCodigo
+        );
+
         holder.tvCarritoPrecioUnitario.setText(
             TraductorManager.getInstance(
                 holder.itemView.getContext()
-            ).getString("formato_precio_cu", String.valueOf(item.precio))
+            ).getString("formato_precio_cu", precioUnitarioFmt)
         );
         holder.tvCarritoCantidad.setText(String.valueOf(item.cantidad));
-        holder.tvCarritoSubtotal.setText(
-            TraductorManager.getInstance(
-                holder.itemView.getContext()
-            ).getString("formato_precio", String.valueOf(item.subtotal))
-        );
+        holder.tvCarritoSubtotal.setText(subtotalFmt);
 
         holder.btnSumar.setOnClickListener(v ->
             listener.onSumarCantidad(item, position)

@@ -1,0 +1,29 @@
+{
+  "apariencia": {
+    "tema_oscuro": false,
+    "color_enfasis": "#4CAF50",
+    "tamano_texto": "pequeno"
+  },
+  "seguridad": {
+    "pin_activo": false,
+    "pin_codigo": "0000",
+    "modo_administrador": true
+  },
+  "negocio": {
+    "nombre_tienda": "ABARROTES TU CHIQUITO"
+  },
+  "venta": {
+    "ventaId": "",
+    "fecha": "",
+    "cliente": "",
+    "productos": [
+      {
+        "nombre": "",
+        "cantidad": "",
+        "precio": ""
+      }
+    ],
+    "subtotal": "",
+    "total": ""
+  }
+}

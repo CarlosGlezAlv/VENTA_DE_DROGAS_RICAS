@@ -193,6 +193,21 @@
                                 android:hint="Nombre de la Tienda"
                             />
                         </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Moneda de visualización:"
+                            android:textColor="?attr/colorOnSurface"
+                            android:layout_marginTop="16dp"
+                        />
+
+                        <Spinner
+                            android:id="@+id/spMonedaVisual"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                        />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

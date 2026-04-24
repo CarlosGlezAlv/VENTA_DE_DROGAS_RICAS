@@ -10,6 +10,7 @@ import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -22,7 +23,7 @@ public class ConfigActivity extends AppCompatActivity {
     private RadioButton rbPequeno, rbMediano, rbGrande;
     private Button btnGuardarConfig;
     private ImageButton btnVolverConfig;
-    private Spinner spIdioma;
+    private Spinner spIdioma, spMonedaVisual;
     private ConfigManager configManager;
     private AppConfig config;
     private SharedPreferences idiomaPrefs;
@@ -68,9 +69,11 @@ public class ConfigActivity extends AppCompatActivity {
         btnGuardarConfig = findViewById(R.id.btnGuardarConfig);
         btnVolverConfig = findViewById(R.id.btnVolverConfig);
         spIdioma = findViewById(R.id.spIdioma);
+        spMonedaVisual = findViewById(R.id.spMonedaVisual);
 
         idiomaPrefs = getSharedPreferences(PREFS_IDIOMA, MODE_PRIVATE);
         setupSelectorIdioma();
+        setupSelectorMoneda();
 
         cargarValores();
         aplicarTraducciones();
@@ -123,6 +126,14 @@ public class ConfigActivity extends AppCompatActivity {
         if (etMensajeSinStock != null) etMensajeSinStock.setHint(
             traductor.getString("config_msg_sin_stock_hint")
         );
+        if (
+            spMonedaVisual != null &&
+            spMonedaVisual.getSelectedView() instanceof TextView
+        ) {
+            ((TextView) spMonedaVisual.getSelectedView()).setTextColor(
+                getResources().getColor(android.R.color.black)
+            );
+        }
         if (btnGuardarConfig != null) btnGuardarConfig.setText(
             traductor.getString("config_btn_guardar")
         );
@@ -165,6 +176,29 @@ public class ConfigActivity extends AppCompatActivity {
         );
     }
 
+    private void setupSelectorMoneda() {
+        if (spMonedaVisual == null) return;
+
+        java.util.List<String> monedas = MonedaManager.getInstance(
+            this
+        ).getMonedasSoportadas();
+
+        if (monedas == null || monedas.isEmpty()) {
+            monedas = new java.util.ArrayList<>();
+            monedas.add("MXN");
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this,
+            android.R.layout.simple_spinner_item,
+            monedas
+        );
+        adapter.setDropDownViewResource(
+            android.R.layout.simple_spinner_dropdown_item
+        );
+        spMonedaVisual.setAdapter(adapter);
+    }
+
     private void cargarValores() {
         // Apariencia
         swTemaOscuro.setChecked(config.apariencia.tema_oscuro);
@@ -179,6 +213,26 @@ public class ConfigActivity extends AppCompatActivity {
 
         // Negocio
         etNombreTienda.setText(config.negocio.nombre_tienda);
+
+        if (spMonedaVisual != null) {
+            String monedaVisual = (config != null && config.negocio != null)
+                ? config.negocio.moneda_visual
+                : "MXN";
+
+            @SuppressWarnings("unchecked")
+            ArrayAdapter<String> adapter = (ArrayAdapter<
+                String
+            >) spMonedaVisual.getAdapter();
+            if (adapter != null) {
+                int position = adapter.getPosition(monedaVisual);
+                if (position < 0) {
+                    position = adapter.getPosition("MXN");
+                }
+                if (position >= 0) {
+                    spMonedaVisual.setSelection(position, false);
+                }
+            }
+        }
 
         // Alertas y Stock
         if (etMinimoAlerta != null) {
@@ -215,6 +269,15 @@ public class ConfigActivity extends AppCompatActivity {
 
             // Guardar Negocio
             config.negocio.nombre_tienda = etNombreTienda.getText().toString();
+
+            if (
+                spMonedaVisual != null &&
+                spMonedaVisual.getSelectedItem() != null
+            ) {
+                config.negocio.moneda_visual = spMonedaVisual
+                    .getSelectedItem()
+                    .toString();
+            }
 
             // Guardar Alertas y Stock
             if (etMinimoAlerta != null) {
