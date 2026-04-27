@@ -47,6 +47,10 @@ public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.Hist
             moneda
         );
         holder.tvTotalVisual.setText(totalFormateado);
+
+        holder.btnExportarPdf.setOnClickListener(v -> {
+            PdfManager.exportarVentaAPdf(v.getContext(), venta);
+        });
     }
 
     @Override
@@ -56,6 +60,7 @@ public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.Hist
 
     public static class HistorialViewHolder extends RecyclerView.ViewHolder {
         TextView tvFolio, tvFecha, tvProductosLista, tvTotalVisual;
+        android.widget.ImageButton btnExportarPdf;
 
         public HistorialViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -63,6 +68,7 @@ public class HistorialAdapter extends RecyclerView.Adapter<HistorialAdapter.Hist
             tvFecha = itemView.findViewById(R.id.tvFecha);
             tvProductosLista = itemView.findViewById(R.id.tvProductosLista);
             tvTotalVisual = itemView.findViewById(R.id.tvTotalVisual);
+            btnExportarPdf = itemView.findViewById(R.id.btnExportarPdf);
         }
     }
 }

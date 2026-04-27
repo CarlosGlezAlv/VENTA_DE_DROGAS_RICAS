@@ -41,6 +41,16 @@
                 android:text="2026-04-27 15:30:00"
                 android:textSize="14sp"
                 android:textColor="#757575"/>
+            
+            <ImageButton
+                android:id="@+id/btnExportarPdf"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_save"
+                app:tint="?attr/colorPrimary"
+                android:contentDescription="Exportar a PDF"/>
         </LinearLayout>
 
         <View
