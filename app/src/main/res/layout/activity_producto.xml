@@ -5,6 +5,18 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/pantalla_de_carga" />
+
+    <View
+        android:id="@+id/overlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6000000" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/mainCard"
         android:layout_width="match_parent"
@@ -28,8 +40,8 @@
                 android:gravity="center_vertical">
                 <ImageButton
                     android:id="@+id/btnVolverProd"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@android:drawable/ic_menu_revert"
                     app:tint="?attr/colorOnSurface" />
@@ -37,8 +49,8 @@
                     android:id="@+id/tvTituloProd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:text="GESTIÓN DE PRODUCTOS"
+                    android:layout_marginStart="8dp"
+                    android:text="PRODUCT MANAGEMENT"
                     android:textColor="?attr/colorOnSurface"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -52,11 +64,11 @@
                 android:layout_marginTop="16dp"
                 app:endIconMode="custom"
                 app:endIconDrawable="@android:drawable/ic_menu_search">
-                <EditText
+
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etCodigo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Código Exacto"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,11 +80,10 @@
                 android:layout_marginTop="8dp"
                 app:endIconMode="custom"
                 app:endIconDrawable="@android:drawable/ic_menu_search">
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etNombre"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Nombre para Filtrar" />
+                    android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -81,11 +92,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp">
-                <EditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etDescripcion"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Descripción" />
+                    android:layout_height="wrap_content" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <LinearLayout
@@ -100,11 +110,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp">
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etExistencia"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Existencia"
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
                 <com.google.android.material.textfield.TextInputLayout
@@ -114,11 +123,10 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp">
-                    <EditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etPrecio"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="Precio"
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
@@ -135,7 +143,7 @@
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    android:text="LIMPIAR"
+                    android:text="CLEAR"
                     app:strokeColor="?attr/colorSecondary"
                     android:textColor="?attr/colorSecondary" />
                 <com.google.android.material.button.MaterialButton
@@ -144,7 +152,7 @@
                     android:layout_height="56dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    android:text="GUARDAR"
+                    android:text="SAVE"
                     app:backgroundTint="?attr/colorPrimary"
                     android:textColor="?attr/colorOnPrimary" />
             </LinearLayout>
@@ -166,7 +174,7 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:layout_margin="12dp"
-        android:text="VER RESUMEN DE INVENTARIO"
+        android:text="VIEW INVENTORY SUMMARY"
         android:textSize="16sp"
         android:textStyle="bold"
         app:backgroundTint="#FF9800"

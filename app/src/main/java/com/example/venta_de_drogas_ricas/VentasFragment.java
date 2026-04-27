@@ -3,7 +3,6 @@ package com.example.venta_de_drogas_ricas;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -20,16 +19,14 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.FileOutputStream;
-import java.io.File;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import android.net.Uri;
 
 public class VentasFragment extends Fragment {
 
@@ -37,41 +34,27 @@ public class VentasFragment extends Fragment {
     private TextView tvInfoProd, tvSubtotalConsultado, tvTotalGeneral;
     private Button btnAgregarAlCarrito, btnTerminarVenta;
     private RecyclerView rvCarrito;
+
     private BD_DrogsDataBase dbHelper;
-    private AppConfig config;
     private ArrayList<ItemCarrito> itemsCarrito = new ArrayList<>();
     private CarritoAdapter adapter;
-    private float totalGeneral = 0;
-    private float precioActual = 0;
     private MonedaManager monedaManager;
-    private String monedaBase = "MXN", monedaVisual = "MXN";
+
+    private float totalGeneral = 0;
     private float stockDisponibleActual = 0;
-    private String nombreActual = "", idActual = "";
+    private String idActual = "";
+    private String nombreActual = "";
+    private float precioActual = 0;
+    private String monedaBase = "MXN";
+    private String monedaVisual = "MXN";
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_ventas, container, false);
-    }
+        View view = inflater.inflate(R.layout.fragment_ventas, container, false);
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), android.Manifest.permission.POST_NOTIFICATIONS) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 101);
-            }
-        }
-
-        ConfigManager manager = ConfigManager.getInstance(requireContext());
-        config = manager.getConfig();
         dbHelper = new BD_DrogsDataBase(requireContext());
         monedaManager = MonedaManager.getInstance(requireContext());
-        if (config != null && config.negocio != null) {
-            if (config.negocio.moneda_base != null && !config.negocio.moneda_base.trim().isEmpty()) monedaBase = config.negocio.moneda_base.trim().toUpperCase();
-            if (config.negocio.moneda_visual != null && !config.negocio.moneda_visual.trim().isEmpty()) monedaVisual = config.negocio.moneda_visual.trim().toUpperCase();
-        }
 
         etCodigoInv = view.findViewById(R.id.etCodigoInv);
         etCantidadVenta = view.findViewById(R.id.etCantidadVenta);
@@ -106,6 +89,8 @@ public class VentasFragment extends Fragment {
 
         btnAgregarAlCarrito.setOnClickListener(v -> agregarAlCarrito());
         btnTerminarVenta.setOnClickListener(v -> terminarVenta());
+
+        return view;
     }
 
     private void recalcularTotal() {

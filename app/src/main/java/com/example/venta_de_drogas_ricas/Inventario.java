@@ -20,6 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -269,72 +276,10 @@ public class Inventario extends AppCompatActivity {
                    limpiarTodo();
                })
                .setNeutralButton("Exportar a Excel", (dialog, id) -> {
-                   exportarAExcel();
+                   exportarAExcelReal();
                });
         
         builder.create().show();
-    }
-
-    private void exportarAExcel() {
-        try {
-            if (itemsCarrito.isEmpty()) {
-                Toast.makeText(this, "No hay productos para exportar", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            ExportarExcelData exportData = new ExportarExcelData();
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(new Date());
-            exportData.fecha = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-            exportData.total_venta = totalGeneral;
-            exportData.productos = new ArrayList<>();
-
-            for (ItemCarrito item : itemsCarrito) {
-                ExportarExcelData.ProductoItem p = new ExportarExcelData.ProductoItem();
-                p.codigo = item.id;
-                p.nombre = item.nombre;
-                p.precio = item.precio;
-                p.cantidad = item.cantidad;
-                p.subtotal = item.subtotal;
-                exportData.productos.add(p);
-            }
-
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            String jsonOutput = gson.toJson(exportData);
-
-            String fileName = "Venta_" + timestamp + ".json";
-            
-            // --- MÉTODO COMPATIBLE PARA GUARDAR EN LA CARPETA DOWNLOADS PÚBLICA ---
-            ContentValues values = new ContentValues();
-            values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
-            values.put(MediaStore.Downloads.MIME_TYPE, "application/json");
-            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
-
-            Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
-            
-            if (uri != null) {
-                try (OutputStream os = getContentResolver().openOutputStream(uri)) {
-                    if (os != null) {
-                        os.write(jsonOutput.getBytes());
-                        os.flush();
-                        Toast.makeText(this, "¡VENTA GUARDADA! Búscala en la carpeta principal de 'Descargas' (Downloads) de tu teléfono.", Toast.LENGTH_LONG).show();
-                    }
-                }
-                limpiarTodo();
-            } else {
-                // Fallback para versiones que no soportan MediaStore Downloads o error de inserción
-                File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                File file = new File(path, fileName);
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    fos.write(jsonOutput.getBytes());
-                    Toast.makeText(this, "Guardado en Descargas: " + fileName, Toast.LENGTH_LONG).show();
-                }
-                limpiarTodo();
-            }
-
-        } catch (Exception e) {
-            android.util.Log.e("EXPORT_ERROR", "Error: ", e);
-            Toast.makeText(this, "ERROR AL GUARDAR: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        }
     }
 
     public static class ExportarExcelData {
@@ -348,6 +293,69 @@ public class Inventario extends AppCompatActivity {
             public float precio;
             public float cantidad;
             public float subtotal;
+        }
+    }
+
+    private void exportarAExcelReal() {
+        try {
+            if (itemsCarrito.isEmpty()) {
+                Toast.makeText(this, "No hay productos para exportar", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Crear el libro de Excel
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("Venta");
+
+            // Crear encabezados
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"Código", "Nombre", "Precio", "Cantidad", "Subtotal"};
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+            }
+
+            // Llenar datos de productos
+            int rowNum = 1;
+            for (ItemCarrito item : itemsCarrito) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(item.id);
+                row.createCell(1).setCellValue(item.nombre);
+                row.createCell(2).setCellValue(item.precio);
+                row.createCell(3).setCellValue(item.cantidad);
+                row.createCell(4).setCellValue(item.subtotal);
+            }
+
+            // Agregar fila de total
+            Row totalRow = sheet.createRow(rowNum + 1);
+            totalRow.createCell(3).setCellValue("TOTAL:");
+            totalRow.createCell(4).setCellValue(totalGeneral);
+
+            // Guardar el archivo .xlsx
+            String timestamp = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(new Date());
+            String fileName = "Venta_" + timestamp + ".xlsx";
+
+            ContentValues values = new ContentValues();
+            values.put(MediaStore.Downloads.DISPLAY_NAME, fileName);
+            values.put(MediaStore.Downloads.MIME_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            values.put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+
+            Uri uri = getContentResolver().insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values);
+
+            if (uri != null) {
+                try (OutputStream os = getContentResolver().openOutputStream(uri)) {
+                    if (os != null) {
+                        workbook.write(os);
+                        Toast.makeText(this, "¡EXCEL GUARDADO! Búscalo en Descargas como: " + fileName, Toast.LENGTH_LONG).show();
+                    }
+                }
+                workbook.close();
+                limpiarTodo();
+            }
+
+        } catch (Exception e) {
+            android.util.Log.e("EXPORT_EXCEL_ERROR", "Error: ", e);
+            Toast.makeText(this, "ERROR AL GUARDAR EXCEL: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 

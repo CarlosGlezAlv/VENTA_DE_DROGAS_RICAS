@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.venta_de_drogas_ricas"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -35,6 +35,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.navigation:navigation-ui:2.7.7")
+    implementation("org.apache.poi:poi:5.2.5")
+    implementation("org.apache.poi:poi-ooxml:5.2.5")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

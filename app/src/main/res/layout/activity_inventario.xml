@@ -6,6 +6,13 @@
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground">
 
+    <!-- Capa de fondo ajustable (overlayView) -->
+    <View
+        android:id="@+id/overlayView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E6000000" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -38,7 +45,7 @@
                 android:layout_centerInParent="true" />
         </RelativeLayout>
 
-        <!-- Sección de Búsqueda y Selección -->
+        <!-- Sección de Búsqueda y Selección (EL FRAME) -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardBusqueda"
             android:layout_width="match_parent"
@@ -129,6 +136,43 @@
                         android:textStyle="bold"
                         app:cornerRadius="8dp" />
                 </LinearLayout>
+
+                <!-- CONTENEDOR PARA BOTONES DE EXPORTAR -->
+                <LinearLayout
+                    android:id="@+id/layoutExportar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="12dp"
+                    android:visibility="gone">
+
+                    <Button
+                        android:id="@+id/btnExportarExcel"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        android:text="EXCEL"
+                        app:backgroundTint="#4CAF50"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:cornerRadius="8dp"
+                        app:icon="@android:drawable/ic_menu_save" />
+
+                    <Button
+                        android:id="@+id/btnExportarPdf"
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="4dp"
+                        android:text="PDF"
+                        app:backgroundTint="#F44336"
+                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        app:cornerRadius="8dp"
+                        app:icon="@android:drawable/ic_menu_save" />
+                </LinearLayout>
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
