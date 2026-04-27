@@ -2,6 +2,7 @@ package com.example.venta_de_drogas_ricas;
 
 import android.content.Context;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileReader;
@@ -14,6 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
+import com.google.gson.annotations.SerializedName;
 
 public class VentasManager {
 
@@ -24,6 +28,7 @@ public class VentasManager {
 
         public String codigo;
         public String nombre;
+        @SerializedName("precio_unitario")
         public float precio;
         public float cantidad;
         public float subtotal;
@@ -45,8 +50,10 @@ public class VentasManager {
 
     public static class VentaRecord {
 
+        public String folio;
         public String fecha;
         public List<ProductoVendido> productos;
+        @SerializedName("total")
         public float total_venta;
         public String moneda_base;
         public String moneda_visual;
@@ -69,6 +76,14 @@ public class VentasManager {
             this.moneda_visual = moneda_visual;
             this.tasa_cambio = tasa_cambio;
             this.total_visual = total_visual;
+        }
+    }
+
+    public static class HistorialCompras {
+        public List<VentaRecord> compras;
+        
+        public HistorialCompras(List<VentaRecord> compras) {
+            this.compras = compras;
         }
     }
 
@@ -136,12 +151,13 @@ public class VentasManager {
             tasaCambio,
             totalVisual
         );
+        nuevaVenta.folio = "V-" + (registro.size() + 1);
 
         registro.add(nuevaVenta);
         guardarRegistro(registro);
     }
 
-    private List<VentaRecord> cargarRegistro() {
+    public List<VentaRecord> cargarRegistro() {
         File file = new File(context.getFilesDir(), FILE_NAME);
         if (!file.exists()) {
             return new ArrayList<>();
@@ -149,13 +165,25 @@ public class VentasManager {
 
         try (FileReader reader = new FileReader(file)) {
             Gson gson = new Gson();
-            Type listType = new TypeToken<
-                ArrayList<VentaRecord>
-            >() {}.getType();
-            List<VentaRecord> list = gson.fromJson(reader, listType);
-            if (list == null) return new ArrayList<>();
-            return list;
-        } catch (IOException e) {
+            JsonElement jsonElement = JsonParser.parseReader(reader);
+            
+            if (jsonElement.isJsonArray()) {
+                Type listType = new TypeToken<ArrayList<VentaRecord>>() {}.getType();
+                List<VentaRecord> list = gson.fromJson(jsonElement, listType);
+                if (list != null) {
+                    int count = 1;
+                    for (VentaRecord v : list) {
+                        if (v.folio == null) v.folio = "V-" + count;
+                        count++;
+                    }
+                    return list;
+                }
+            } else if (jsonElement.isJsonObject()) {
+                HistorialCompras historial = gson.fromJson(jsonElement, HistorialCompras.class);
+                if (historial != null && historial.compras != null) return historial.compras;
+            }
+            return new ArrayList<>();
+        } catch (Exception e) {
             e.printStackTrace();
             return new ArrayList<>();
         }
@@ -164,8 +192,9 @@ public class VentasManager {
     private void guardarRegistro(List<VentaRecord> registro) {
         File file = new File(context.getFilesDir(), FILE_NAME);
         try (FileWriter writer = new FileWriter(file)) {
-            Gson gson = new Gson();
-            gson.toJson(registro, writer);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            HistorialCompras historial = new HistorialCompras(registro);
+            gson.toJson(historial, writer);
         } catch (IOException e) {
             e.printStackTrace();
         }

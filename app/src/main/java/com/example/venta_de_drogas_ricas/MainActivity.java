@@ -95,5 +95,15 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             });
         }
+
+        Button btnHistorial = findViewById(R.id.btnHistorial);
+        if (btnHistorial != null) {
+            // Se puede traducir si "main_btn_historial" se añade en traductor.json
+            // btnHistorial.setText(traductor.getString("main_btn_historial"));
+            btnHistorial.setOnClickListener(v -> {
+                Intent intent = new Intent(MainActivity.this, HistorialActivity.class);
+                startActivity(intent);
+            });
+        }
     }
 }
