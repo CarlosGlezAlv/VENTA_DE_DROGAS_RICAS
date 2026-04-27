@@ -33,6 +33,8 @@ android {
 
 dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.navigation:navigation-fragment:2.7.7")
+    implementation("androidx.navigation:navigation-ui:2.7.7")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

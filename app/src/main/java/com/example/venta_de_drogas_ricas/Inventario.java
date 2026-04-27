@@ -337,17 +337,17 @@ public class Inventario extends AppCompatActivity {
         }
     }
 
-    private static class ExportarExcelData {
-        String fecha;
-        float total_venta;
-        ArrayList<ProductoItem> productos;
+    public static class ExportarExcelData {
+        public String fecha;
+        public float total_venta;
+        public ArrayList<ProductoItem> productos;
 
-        static class ProductoItem {
-            String codigo;
-            String nombre;
-            float precio;
-            float cantidad;
-            float subtotal;
+        public static class ProductoItem {
+            public String codigo;
+            public String nombre;
+            public float precio;
+            public float cantidad;
+            public float subtotal;
         }
     }
 

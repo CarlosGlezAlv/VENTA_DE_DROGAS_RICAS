@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/nav_inicio">
+
+    <fragment
+        android:id="@+id/nav_inicio"
+        android:name="com.example.venta_de_drogas_ricas.InicioFragment"
+        android:label="Inicio"/>
+
+    <fragment
+        android:id="@+id/nav_inventario"
+        android:name="com.example.venta_de_drogas_ricas.InventarioFragment"
+        android:label="Inventario"/>
+
+    <fragment
+        android:id="@+id/nav_ventas"
+        android:name="com.example.venta_de_drogas_ricas.VentasFragment"
+        android:label="Ventas"/>
+
+    <fragment
+        android:id="@+id/nav_historial"
+        android:name="com.example.venta_de_drogas_ricas.HistorialFragment"
+        android:label="Historial"/>
+
+    <fragment
+        android:id="@+id/nav_configuracion"
+        android:name="com.example.venta_de_drogas_ricas.ConfigFragment"
+        android:label="Configuración"/>
+
+</navigation>
